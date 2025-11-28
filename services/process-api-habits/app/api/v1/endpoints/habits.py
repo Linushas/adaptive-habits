@@ -1,18 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from supabase import Client
-from app.db import get_supabase
-from app.schemas import HabitResponse, Habit
+from fastapi import APIRouter, Depends
+from sqlmodel import Session, select
+from app.db import get_session
+from app.models import Habit, User
+from app.auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/", response_model=List[HabitResponse])
-def read_habits(db: Client = Depends(get_supabase)):
-    response = db.table("habits").select("*").execute()
-    return response.data
-
-@router.post("/", response_model=HabitResponse)
-def create_habit(habit: Habit, db: Client = Depends(get_supabase)):
-    habit_data = habit.model_dump()
-    response = db.table("habits").insert(habit_data).execute()
-    return response.data[0]
+@router.get("/", response_model=List[Habit])
+def read_habits(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    statement = select(Habit).where(Habit.user_id == current_user.id)
+    return session.exec(statement).all()

@@ -1,14 +1,16 @@
-from supabase import create_client, Client
-from app.config import settings
-from fastapi import Header, Depends
+from sqlmodel import SQLModel, create_engine, Session
 
-supabase: Client = create_client(
-    settings.SUPABASE_URL, 
-    settings.SUPABASE_SERVICE_KEY
+sqlite_file_name = "adaptive_habits.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+engine = create_engine(
+    sqlite_url, 
+    connect_args={"check_same_thread": False}
 )
 
-def get_supabase(authorization: str = Header(None)) -> Client:
-    client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-    if authorization:
-        client.auth.set_session(authorization.replace("Bearer ", ""), "")
-    return client
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+def get_session():
+    with Session(engine) as session:
+        yield session

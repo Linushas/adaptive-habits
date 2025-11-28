@@ -4,8 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
-    SUPABASE_SERVICE_KEY: str = os.getenv("SUPABASE_SERVICE_KEY", "")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
+    DISABLE_AUTH: bool = os.getenv("DISABLE_AUTH", "False").lower() == "true"
 
 settings = Settings()
