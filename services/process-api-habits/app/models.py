@@ -13,7 +13,7 @@ class User(SQLModel, table=True):
 class HabitBase(SQLModel):
     name: str
     description: Optional[str] = None
-    target_value: int = 1
+    current_target_value: int = 1
     frequency: str = "daily"
     unit: Optional[str] = None
 
@@ -37,7 +37,17 @@ class HabitEntry(SQLModel, table=True):
     habit_id: UUID = Field(foreign_key="habit.id")
     log_date: date
     value: int
+    target_snapshot: int
     notes: Optional[str] = None
     completed_at: datetime = Field(default_factory=datetime.utcnow)
 
     # OLD: UNIQUE(habit_id, log_date)
+
+class HabitAuditLog(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    habit_id: UUID = Field(foreign_key="habit.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    previous_target: int
+    new_target: int
+    reason: str 
