@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar"
 import "./globals.css";
+import Sidepanel from "@/components/ui/Sidepanel";
+import { AgentPanel } from "@/components/layout/AgentPanel";
+import AppLayout from "@/components/layout/AppLayout";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
@@ -23,8 +26,9 @@ export default function RootLayout({
       <body
         className={`${instrumentSans.variable} antialiased bg-bg`}
       >
-        {/* <Navbar /> */}
-        {children}
+        <AppLayout>
+          {children}
+        </AppLayout>
       </body>
     </html>
   );

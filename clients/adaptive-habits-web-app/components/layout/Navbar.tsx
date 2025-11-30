@@ -14,7 +14,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           <a href={'/'} >
             <Image
-              src="/logo.png"
+              src="/ah-logo.png"
               alt="Adaptive Habits Logo"
               width={64}
               height={8}
