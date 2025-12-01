@@ -13,3 +13,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
+
+  webapp:
+    container_name: adaptive-habits-web-app
+    build:
+      context: ./clients/adaptive-habits-web-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: always
