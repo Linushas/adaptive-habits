@@ -36,7 +36,7 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
     const handleSliderChange = (vals: number[]) => {
         const newValue = vals[0];
         setLocalValue(newValue);
-        if(onValueChange) onValueChange(newValue);
+        if (onValueChange) onValueChange(newValue);
     };
 
     return (
@@ -45,14 +45,14 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
                 <div className="flex items-center justify-between">
                     <h3>{title}</h3>
                     {(targetValue === 1) ? (
-                        (value == 1) ? (
+                        (localValue == 1) ? (
                             <span>Done</span>
                         ) : (
                             <span></span>
                         )
                     ) : (
                         <div className="flex gap-1 font-mono tabular-nums">
-                            <motion.span>{displayValue}</motion.span> 
+                            <motion.span>{displayValue}</motion.span>
                             <span>/ {targetValue} {unit != null ? unit : ""}</span>
                         </div>
                     )}
@@ -61,15 +61,15 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
             <CardContent className="pb-8 pt-2 max-h-20 h-20">
                 {(targetValue == 1) ? (
                     <div className="flex items-center justify-center">
-                        <div 
-                            className={`${value 
-                                    ? "cursor-pointer bg-fg w-16 h-16 text-bg-dark flex items-center justify-center m-auto rounded-md" 
-                                    : "cursor-pointer bg-bg-light-2 w-16 h-16 text-fg-muted border border-fg-muted flex items-center justify-center m-auto rounded-md"
+                        <div
+                            className={`${localValue
+                                ? "cursor-pointer bg-fg w-16 h-16 text-bg-dark flex items-center justify-center m-auto rounded-md"
+                                : "cursor-pointer bg-bg-light-2 w-16 h-16 text-fg-muted border border-fg-muted flex items-center justify-center m-auto rounded-md"
                                 }
                             `}
-                            onClick={() => {if(onValueChange) onValueChange(value ? 0 : 1)}}
+                            onClick={() => { setLocalValue(localValue ? 0 : 1) }}
                         >
-                            {value ? (
+                            {localValue ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8">
                                     <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
                                 </svg>
@@ -80,7 +80,7 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
                     </div>
                 ) : (
                     <Slider
-                        value={[value]} 
+                        value={[localValue]}
                         min={0}
                         max={targetValue}
                         step={1}

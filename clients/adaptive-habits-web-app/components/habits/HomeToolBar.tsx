@@ -1,25 +1,13 @@
-import { HabitModel } from "@/types";
+"use client";
+
 import { Button } from "../ui/button";
-import { addHabitAction } from "@/app/actions";
+import { NewHabitDialog } from "./NewHabitDialog";
 
 interface ToolBarProps {
     className?: string,
 }
 
 export function HomeToolBar({ className }: ToolBarProps) {
-    const handleNewHabit = async () => {
-        const newHabit: HabitModel = {
-            name: "My New Habit",
-            current_target_value: 12,
-        };
-
-        try {
-            await addHabitAction(newHabit); 
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
     return (
         <div className={`${className} pt-32 flex justify-between`}>
             <Button variant={"secondary"}>
@@ -29,9 +17,7 @@ export function HomeToolBar({ className }: ToolBarProps) {
                 <Button variant={"secondary"} className="m-2">
                     Hide Completed
                 </Button>
-                <Button variant={"primary"} onClick={handleNewHabit}>
-                    New Habit
-                </Button>
+                <NewHabitDialog />
             </div>
         </div>
     );
