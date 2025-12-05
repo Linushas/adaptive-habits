@@ -25,11 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.on_event("startup") # deprecated
-# def on_startup():
-#     create_db_and_tables()
-
 app.include_router(habits.router, prefix="/api/v1/habits", tags=["habits"])
+app.include_router(habits.router, prefix="/api/v1/entries", tags=["entries"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 
 @app.get("/")

@@ -18,10 +18,10 @@ export default function AppLayout({
             isOpen={isSidepanelOpen} 
             setIsOpen={setIsSidepanelOpen}
         >
-        <Navbar />
-            <div className="min-h-screen bg-bg text-fg">
+            <Navbar />
+            <main className="flex-1 overflow-y-auto min-h-0 bg-bg text-fg">
                 {children}
-            </div>
+            </main>
         </Sidepanel>
     );
 }

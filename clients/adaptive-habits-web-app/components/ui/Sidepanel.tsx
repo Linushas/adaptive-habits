@@ -18,6 +18,8 @@ interface SidepanelProps {
 export default function Sidepanel({ children, panel, isOpen, setIsOpen }: SidepanelProps) {
   const togglePanel = () => setIsOpen((prev) => !prev);
 
+  const sharedChildrenClasses = "w-full h-screen bg-bg flex flex-col overflow-hidden relative";
+
   return (
     <>
       {isOpen ? (
@@ -46,16 +48,16 @@ export default function Sidepanel({ children, panel, isOpen, setIsOpen }: Sidepa
               </ResizablePanel>
               <ResizableHandle />
             <ResizablePanel defaultSize={80}>
-              <div className="h-full w-full overflow-y-auto">
+              <div className={`h-full ${sharedChildrenClasses}`}>
                 {children}
               </div>
             </ResizablePanel>
         </ResizablePanelGroup>
       ) : (
-        <> 
+        <div className={`h-screen ${sharedChildrenClasses}`}>
           {children} 
-        </>
-      )};
+        </div>
+      )}
     </>
   );
 }

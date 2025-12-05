@@ -9,9 +9,9 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="min-w-full bg-bg text-fg-muted relative z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="min-w-full shrink-0 bg-bg text-fg-muted relative top-0 z-50">
+      <div className="max-w-7xl bg-transparent mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center bg-transparent justify-between h-16">
           <a href={'/'} >
             <Image
               src="/ah-logo.png"
@@ -21,8 +21,8 @@ export function Navbar() {
             />
           </a>
 
-          <div className="hidden md:block">
-            <ul className="flex space-x-6 items-center">
+          <div className="hidden md:block bg-transparent">
+            <ul className="flex space-x-6 items-center bg-transparent">
               {navLinks.map((link) => (
                 <li key={link.name}>
                   <a 

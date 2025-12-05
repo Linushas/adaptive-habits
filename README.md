@@ -6,5 +6,25 @@ This repo follows a monorepo-structure.
 - clients/ is where the webapp is located. 
 - services/ contains the backend API's
 
+## Run dev app
+```bash
+make dev
+```
+...and clean up:
+```bash
+make clean
+```
+
+## Run production app
+```bash
+make up
+```
+...or use docker compose.
+
+Clean up with:
+```bash
+make down
+```
+
 # Architecture Diagram
-![](./resources/architecture_diagram.png)
+<!-- ![](./resources/architecture_diagram.png) -->

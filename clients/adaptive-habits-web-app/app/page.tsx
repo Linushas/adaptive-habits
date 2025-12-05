@@ -1,30 +1,37 @@
 import { HabitCard } from "@/components/habits/HabitCard";
+import { HomeToolBar } from "@/components/habits/HomeToolBar";
+import { getHabits } from "@/services/habits";
+import { HabitModel } from "@/types/index"
 
-const habits = [
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-  {title: 'Read', value: 0, targetValue: 30, unit: "pages"},
-]
+export default async function Home() {
+  const habits:HabitModel[] = await getHabits();
 
-export default function Home() {
   return (
-    <div className="bg-bg min-h-screen flex items-center justify-center">
-      <div className="flex flex-wrap flex-row justify-center p-4 gap-4">
-        {habits.map((habit) => (
-          <li key={habits.indexOf(habit)}>
-            <HabitCard 
-              title={habit.title}
-              value={habit.value}
-              targetValue={habit.targetValue}
-              unit={habit.unit}
-            />
-          </li>
-        ))}
-      </div>
+    <div className="bg-bg min-h-full w-full items-center justify-center flex flex-col">
+      
+        <div className="flex min-w-4xl px-10 p-4 flex-wrap justify-start gap-4">
+          <HomeToolBar className="min-w-full" />
+        </div>
+        {(habits.length == 0) ? (<p className="text-fg-muted">No habits</p>) : (
+        <>
+          <div className="py-8 flex w-full max-w-4xl p-4 flex-wrap justify-center items-center flex-col">
+            
+              <div className="flex flex-wrap justify-evenly gap-4">
+                {habits.map((habit, index) => (
+                  <div key={index} className="contents"> 
+                    <HabitCard
+                      title={habit.name}
+                      value={0}
+                      targetValue={habit.current_target_value}
+                      unit={habit.unit}
+                    />
+                  </div>
+                ))}
+              </div>
+            
+          </div>
+        </>
+      )}
     </div>
   );
 }
