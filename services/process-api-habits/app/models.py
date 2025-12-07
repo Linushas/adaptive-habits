@@ -39,7 +39,6 @@ class HabitEntryBase(SQLModel):
     value: int
     target_snapshot: int
     notes: Optional[str] = None
-    completed_at: datetime = Field(default_factory=datetime.utcnow)
 
     # OLD: UNIQUE(habit_id, log_date)
 
@@ -63,3 +62,18 @@ class HabitAuditLog(SQLModel, table=True):
     previous_target: int
     new_target: int
     reason: str 
+
+class HabitTodayEntryBase(SQLModel):
+    habit: Habit
+    log_date: date
+    value: int
+    target_snapshot: int
+    notes: Optional[str] = None
+    completed_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class HabitTodayEntry(HabitEntryBase, table=False):
+    habit: Habit
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    user_id: UUID = Field(foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)

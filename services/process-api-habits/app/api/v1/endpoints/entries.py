@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
 from app.db import get_session
-from app.models import HabitEntry, HabitEntryBase, User, HabitEntryUpdate
+from app.models import HabitEntry, HabitEntryBase, User, HabitEntryUpdate, HabitTodayEntryBase, HabitTodayEntry, Habit
 from app.auth import get_current_user
 
 router = APIRouter()
@@ -52,3 +52,37 @@ def update_habit_entry(
     session.commit()
     session.refresh(habit)
     return habit
+
+@router.get("/today", response_model=List[HabitTodayEntry])
+def get_todays_entries(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    today = date.today()
+    todays_entries: List[HabitTodayEntry] = []
+    
+    habits: List[Habit] = session.exec(select(Habit).where(Habit.user_id == current_user.id)).all()
+
+    for habit in habits:
+        statement = select(HabitEntry).where(HabitEntry.habit_id == habit.id, HabitEntry.log_date == today)
+        entry: HabitEntry = session.exec(statement).first()
+        
+        if not entry:
+            entry = HabitEntry(
+                habit_id=habit.id,
+                user_id=current_user.id,
+                log_date=today,
+                value=0,
+                target_snapshot=habit.current_target_value 
+            )
+            session.add(entry)
+            session.commit()
+            session.refresh(entry)
+        
+        today_entry = HabitTodayEntry(**entry.model_dump(), habit=habit)
+        todays_entries.append(today_entry)
+
+    return todays_entries
+
+
+# @router.get("/calendar")

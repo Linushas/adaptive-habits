@@ -16,7 +16,7 @@ dev:
 clean:
 	npx kill-port 8000
 	rm -rf ./services/process-api-habits/venv
-	rm -rf ./services/process-api-habits/adaptive_habits.db
+# 	rm -rf ./services/process-api-habits/adaptive_habits.db
 	npx kill-port 3000
 	rm -rf ./clients/adaptive-habits-web-app/.next
 

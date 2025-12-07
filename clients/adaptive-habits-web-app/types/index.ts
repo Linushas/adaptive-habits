@@ -1,10 +1,5 @@
-// export interface Habit {
-//   name: string;
-//   value: number;
-//   targetValue: number;
-//   unit?: string;
-// }
 
+// ---- HABITS ----
 export interface HabitResponse {
   name: string;
   description?: string
@@ -20,3 +15,24 @@ export interface HabitModel {
   frequency?: string;
   unit?: string;
 }
+
+// ---- ENTRIES ----
+
+export interface HabitEntry {
+  id: string,
+  habit: HabitModel,
+  log_date: string,
+  value: number,
+  target_snapshot: number,
+  notes?: string,
+}
+
+export interface HabitEntryUpdate {
+  id: string,
+  habit?: HabitModel,
+  log_date?: string,
+  value?: number,
+  target_snapshot?: number,
+  notes?: string,
+}
+

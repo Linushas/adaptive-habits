@@ -4,17 +4,20 @@ import { useState, useEffect } from "react";
 import { Slider } from "../ui/slider";
 import { Card, CardContent, CardTitle } from "../ui/card";
 import { motion, useSpring, useTransform } from "framer-motion";
+import { HabitEntry, HabitEntryUpdate } from "@/types";
+import { updateHabitEntry } from "@/services/entries";
+import { ta } from "date-fns/locale";
 
 interface HabitCardProps {
     title: string;
     value: number;
     targetValue: number;
+    habitEntry: HabitEntry;
     unit?: string;
     className?: string;
-    onValueChange?: (newValue: number) => void;
 }
 
-export function HabitCard({ title, value, targetValue, unit, className, onValueChange }: HabitCardProps) {
+export function HabitCard({ title, value, targetValue, habitEntry, unit, className}: HabitCardProps) {
     const [localValue, setLocalValue] = useState(value);
 
     useEffect(() => {
@@ -39,8 +42,35 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
         if (onValueChange) onValueChange(newValue);
     };
 
+    const handleCheckboxChange = (value: number) => {
+        const newValue = value ? 0 : 1;
+        setLocalValue(newValue);
+        onValueChange(newValue);
+    }
+
+    async function onValueChange(value: number) {
+        const entry: HabitEntryUpdate = {
+            id: habitEntry.id,
+            value: value
+        };
+
+        try {
+            await updateHabitEntry(entry);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     return (
-        <Card className={`${className} w-fit min-w-sm p-4 flex-1 hover:bg-bg-light-2/60 cursor-pointer`}>
+        <Card 
+            className={`
+                ${className} w-fit min-w-sm p-4 flex-1 hover:bg-bg-light-2/60 cursor-pointer
+                ${localValue == targetValue 
+                    ? "shadow-2xl shadow-fg/10"
+                    : "shadow-none"
+                }
+            `}
+        >
             <CardTitle>
                 <div className="flex items-center justify-between">
                     <h3>{title}</h3>
@@ -67,7 +97,7 @@ export function HabitCard({ title, value, targetValue, unit, className, onValueC
                                 : "cursor-pointer bg-bg-light-2 w-16 h-16 text-fg-muted border border-fg-muted flex items-center justify-center m-auto rounded-md"
                                 }
                             `}
-                            onClick={() => { setLocalValue(localValue ? 0 : 1) }}
+                            onClick={() => { handleCheckboxChange(localValue) }}
                         >
                             {localValue ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-8">
