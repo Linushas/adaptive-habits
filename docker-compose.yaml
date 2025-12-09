@@ -8,11 +8,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    # volumes:
+    #   - ./services/process-api-habits:/app
     volumes:
-      - ./services/process-api-habits:/app
+      - habit_data:/data
+    environment:
+      - DATABASE_URL=sqlite:////data/adaptive_habits.db 
+      - ALLOWED_ORIGINS=http://localhost:3000
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
+    
 
   webapp:
     container_name: adaptive-habits-web-app
@@ -24,3 +30,7 @@ services:
     environment:
       - INTERNAL_API_URL=http://process-api-habits:8000/api/v1
     restart: always
+
+volumes:
+  habit_data:
+  

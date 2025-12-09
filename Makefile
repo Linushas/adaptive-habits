@@ -1,7 +1,7 @@
 include services/process-api-habits/.env
 export
 
-.PHONY: up down logs restart db-reset dev
+.PHONY: up down db-reset dev
 
 up:
 	@echo "Starting app..."
@@ -16,10 +16,12 @@ dev:
 clean:
 	npx kill-port 8000
 	rm -rf ./services/process-api-habits/venv
-# 	rm -rf ./services/process-api-habits/adaptive_habits.db
 	npx kill-port 3000
 	rm -rf ./clients/adaptive-habits-web-app/.next
 
 down:
 	@echo "Stopping backend..."
 	docker compose down
+
+db-reset:
+	rm -rf ./services/process-api-habits/adaptive_habits.db

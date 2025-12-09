@@ -17,9 +17,10 @@ app = FastAPI(lifespan=lifespan, title="process-api-habits")
 if settings.DISABLE_AUTH:
     app.dependency_overrides[get_current_user] = get_dev_user
 
+origins = settings.ALLOWED_ORIGINS.split(",") if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

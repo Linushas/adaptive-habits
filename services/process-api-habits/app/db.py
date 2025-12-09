@@ -1,7 +1,8 @@
+import os
 from sqlmodel import SQLModel, create_engine, Session
 
 sqlite_file_name = "adaptive_habits.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+sqlite_url = os.getenv("DATABASE_URL", "sqlite:///adaptive_habits.db")
 
 engine = create_engine(
     sqlite_url, 
