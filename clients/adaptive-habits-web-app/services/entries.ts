@@ -1,7 +1,7 @@
 import { CalendarHabitEntry, HabitEntry, HabitEntryUpdate } from "@/types";
 import { formatDateForApi } from "@/lib/utils";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
 export const getTodaysEntries = async (selectedDate?: Date): Promise<HabitEntry[]> => {
   if(!selectedDate) {

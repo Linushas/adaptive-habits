@@ -1,6 +1,6 @@
 import { HabitModel } from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
 export const getHabits = async (): Promise<HabitModel[]> => {
   const res = await fetch(`${API_URL}/habits`, {

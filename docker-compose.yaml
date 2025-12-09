@@ -21,4 +21,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - INTERNAL_API_URL=http://process-api-habits:8000/api/v1
     restart: always
