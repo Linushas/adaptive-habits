@@ -55,15 +55,24 @@ def update_habit_entry(
 
 @router.get("/today", response_model=List[HabitTodayEntry])
 def get_todays_entries(
+    selected_date: Optional[date] = None,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
     today = date.today()
+    if selected_date:
+        today:date = selected_date
+        
+    print(today)
+    
     todays_entries: List[HabitTodayEntry] = []
     
     habits: List[Habit] = session.exec(select(Habit).where(Habit.user_id == current_user.id)).all()
 
     for habit in habits:
+        if(habit.created_at.date() > today):
+            continue
+        
         statement = select(HabitEntry).where(HabitEntry.habit_id == habit.id, HabitEntry.log_date == today)
         entry: HabitEntry = session.exec(statement).first()
         
