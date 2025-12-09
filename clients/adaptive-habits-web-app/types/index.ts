@@ -36,3 +36,8 @@ export interface HabitEntryUpdate {
   notes?: string,
 }
 
+export interface CalendarHabitEntry {
+  log_date: string,
+  completion_percentage: number,
+}
+

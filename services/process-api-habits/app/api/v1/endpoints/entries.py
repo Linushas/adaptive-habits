@@ -1,10 +1,10 @@
 from typing import List, Optional
-from datetime import date
+from datetime import date, timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
 from app.db import get_session
-from app.models import HabitEntry, HabitEntryBase, User, HabitEntryUpdate, HabitTodayEntryBase, HabitTodayEntry, Habit
+from app.models import HabitEntry, HabitEntryBase, User, HabitEntryUpdate, HabitTodayEntryBase, HabitTodayEntry, Habit, CalendarHabitEntry
 from app.auth import get_current_user
 
 router = APIRouter()
@@ -85,4 +85,44 @@ def get_todays_entries(
     return todays_entries
 
 
-# @router.get("/calendar")
+@router.get("/calendar", response_model=List[CalendarHabitEntry])
+def get_calendar_entries(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    if not start_date or not end_date:
+        return []
+    
+    calendar_entries: List[CalendarHabitEntry] = []
+    
+    for i in range(1, (end_date-start_date).days + 1):
+        d: date = start_date + timedelta(days=i)
+        
+        statement = select(HabitEntry).where(
+            HabitEntry.user_id == current_user.id, 
+            HabitEntry.log_date == d
+        )
+        entries: List[HabitEntry] = session.exec(statement).all()
+        
+        if entries:
+            total_percentage = 0
+            for entry in entries:
+                if entry.target_snapshot > 0:
+                    total_percentage += (entry.value*100)/entry.target_snapshot
+            avg: int = int(total_percentage/len(entries))
+            
+            calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
+                log_date = d,
+                completion_percentage = avg
+            )
+            calendar_entries.append(calendar_entry)
+        else:
+            calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
+                log_date = d,
+                completion_percentage = 0
+            )
+            calendar_entries.append(calendar_entry)
+        
+    return calendar_entries

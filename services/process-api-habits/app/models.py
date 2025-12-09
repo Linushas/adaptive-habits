@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel
+from pydantic import BaseModel
 from datetime import datetime, date
 
 ### USER ###
@@ -77,3 +78,8 @@ class HabitTodayEntry(HabitEntryBase, table=False):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CalendarHabitEntry(BaseModel):
+    log_date: date
+    completion_percentage: int
+    
