@@ -53,7 +53,9 @@ function CalendarCard({ log_date, completion_percentage }: CalendarHabitEntry) {
             <Card
                 className={`
                     relative w-24 h-24 transition-all duration-200 hover:shadow-xl hover:shadow-fg/10 cursor-pointer 
-                    ${(dayNr == today.getDate()) ? "border-fg-muted" : ""}
+                    ${(dayNr == today.getDate() && date.getMonth() == today.getMonth() && date.getFullYear() == today.getFullYear()) 
+                        ? "border-fg-muted" : ""
+                    }
                 `}
                 style={{
                     backgroundColor: bgColorString,
