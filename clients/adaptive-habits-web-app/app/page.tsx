@@ -6,6 +6,9 @@ export default async function Home() {
   const todays_entries: HabitEntry[] = await getTodaysEntries();
 
   return (
-    <HomeDashboard entries={todays_entries} />
+    <HomeDashboard
+      key={JSON.stringify(todays_entries)}
+      entries={todays_entries}
+    />
   );
 }
