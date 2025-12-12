@@ -27,7 +27,7 @@ export const updateHabitEntry = async (entry: HabitEntryUpdate) => {
 
 export const getCalendar = async (startDate?: Date, endDate?: Date): Promise<CalendarHabitEntry[]> => {
   const now = new Date();
-  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 0);
+  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
   let startStr = formatDateForApi(monthStartDate);

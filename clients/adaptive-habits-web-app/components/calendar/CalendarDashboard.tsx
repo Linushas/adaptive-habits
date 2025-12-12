@@ -43,7 +43,7 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
 
         try {
             // console.log(newYear, newMonth) 
-            const entries: CalendarHabitEntry[] = await getCalendar(new Date(newYear, newMonth, 0), new Date(newYear, newMonth+1, 0))
+            const entries: CalendarHabitEntry[] = await getCalendar(new Date(newYear, newMonth, 1), new Date(newYear, newMonth+1, 0))
             if (entries) setCalendarEntries(entries);
         } catch (e) {
             console.error(e);

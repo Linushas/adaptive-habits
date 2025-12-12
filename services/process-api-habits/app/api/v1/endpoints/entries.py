@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import date, timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
@@ -101,37 +101,48 @@ def get_calendar_entries(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
+    calendar_entries: List[CalendarHabitEntry] = []
+    
     if not start_date or not end_date:
         return []
     
-    calendar_entries: List[CalendarHabitEntry] = []
-    
-    for i in range(1, (end_date-start_date).days + 1):
-        d: date = start_date + timedelta(days=i)
-        
-        statement = select(HabitEntry).where(
+    statement = select(HabitEntry).where(
             HabitEntry.user_id == current_user.id, 
-            HabitEntry.log_date == d
+            HabitEntry.log_date >= start_date,
+            HabitEntry.log_date <= end_date
         )
-        entries: List[HabitEntry] = session.exec(statement).all()
-        
-        if entries:
-            total_percentage = 0
-            for entry in entries:
-                if entry.target_snapshot > 0:
-                    total_percentage += (entry.value*100)/entry.target_snapshot
-            avg: int = int(total_percentage/len(entries))
-            
-            calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
-                log_date = d,
-                completion_percentage = avg
-            )
-            calendar_entries.append(calendar_entry)
-        else:
-            calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
-                log_date = d,
-                completion_percentage = 0
-            )
-            calendar_entries.append(calendar_entry)
-        
+    all_entries: List[HabitEntry] = session.exec(statement).all()
+    
+    entries_date_lookup: Dict[date, List[HabitEntry]] = {}
+    for entry in all_entries:
+        if entry.log_date not in entries_date_lookup:
+            entries_date_lookup[entry.log_date] = []
+        entries_date_lookup[entry.log_date].append(entry)
+    
+    for i in range(0, (end_date-start_date).days + 1):
+        d: date = start_date + timedelta(days=i)
+        calendar_entries.append(
+            calendar_entry_from_entries(entries_date_lookup.get(d, []), d)
+        )
     return calendar_entries
+
+def calendar_entry_from_entries(entries: List[HabitEntry], d: date) -> CalendarHabitEntry:
+    if entries:
+        total_percentage = 0
+        for entry in entries:
+            if entry.target_snapshot > 0:
+                total_percentage += (entry.value*100)/entry.target_snapshot
+        avg: int = int(total_percentage/len(entries))
+        
+        calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
+            log_date = d,
+            completion_percentage = avg
+        )
+        return calendar_entry
+    else:
+        calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
+            log_date = d,
+            completion_percentage = 0
+        )
+        return calendar_entry
+    
