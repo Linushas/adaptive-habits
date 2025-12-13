@@ -14,7 +14,7 @@ export async function loginAction(prevState: any, formData: FormData) {
         const res: Response = await login(username as string, password as string);
 
         const setCookieHeader = res.headers.get("set-cookie");
-        if (setCookieHeader) {
+        if(setCookieHeader) {
             const cookieStore = await cookies();
             const chunks = setCookieHeader.split(/,(?=\s*\w+=)/);
             

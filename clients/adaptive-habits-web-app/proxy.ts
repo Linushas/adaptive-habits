@@ -1,21 +1,78 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function proxy(request: NextRequest) {
-    const token = request.cookies.get('access_token')?.value
+const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
+export async function proxy(request: NextRequest) {
+    const accessToken = request.cookies.get('access_token')?.value
+    const refreshToken = request.cookies.get('refresh_token')?.value
     const publicPaths = ['/login', '/register'];
     const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
+    const forceRefresh = request.nextUrl.searchParams.get('refresh') === 'true';
 
-    if(!token && !isPublicPath) {
+    if (accessToken && !forceRefresh) {
+        if (isPublicPath) {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
+        return NextResponse.next()
+    }
+
+    if (refreshToken) {
+        return await refresh(refreshToken, forceRefresh, request.url);
+    }
+
+    if (!isPublicPath) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    if(token && isPublicPath) {
-        return NextResponse.redirect(new URL('/', request.url))
-    }
-
     return NextResponse.next()
+}
+
+async function refresh(refreshToken: string, forceRefresh: boolean, url: string) {
+    try {
+        const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
+            method: "POST",
+            headers: {
+                "Cookie": `refresh_token=${refreshToken}`
+            }
+        });
+
+        if (refreshRes.ok) {
+            let response: NextResponse;
+            
+            if (forceRefresh) {
+                const cleanUrl = new URL(url);
+                cleanUrl.searchParams.delete('refresh');
+                response = NextResponse.redirect(cleanUrl);
+            } else {
+                response = NextResponse.next();
+            }
+
+            const setCookieHeaderValues = refreshRes.headers.getSetCookie();
+            
+            setCookieHeaderValues.forEach(cookieStr => {
+                const [nameValue] = cookieStr.split(';');
+                const [name, value] = nameValue.split('=');
+                if (name && value) {
+                    const trimmedName = name.trim();
+                    const trimmedValue = value.trim();
+
+                    response.cookies.set({
+                        name: trimmedName,
+                        value: trimmedValue,
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'lax',
+                        path: '/'
+                    });
+                }
+            });
+
+            return response;
+        }
+    } catch (error) {
+        console.error("Token refresh failed:", error);
+    }
 }
 
 export const config = {

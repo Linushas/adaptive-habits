@@ -3,6 +3,7 @@
 import { CalendarHabitEntry, HabitEntry, HabitEntryUpdate } from "@/types";
 import { formatDateForApi } from "@/lib/utils";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,7 +26,11 @@ export const getTodaysEntries = async (selectedDate?: Date): Promise<HabitEntry[
     cache: 'no-store',
     headers: headers,
   });
-  if (res.status === 401) throw new Error("Unauthorized");
+  
+  if (res.status === 401) {
+    redirect("/?refresh=true");
+  }
+  
   if (!res.ok) throw new Error('Failed to fetch habit entries');
   return res.json();
 };
@@ -37,7 +42,11 @@ export const updateHabitEntry = async (entry: HabitEntryUpdate) => {
     headers: headers,
     body: JSON.stringify(entry),
   });
-  if (res.status === 401) throw new Error("Unauthorized");
+  
+  if (res.status === 401) {
+    redirect("/?refresh=true");
+  }
+  
   if (!res.ok) throw new Error('Failed to update habit entry');
   return res.json();
 };
@@ -59,7 +68,11 @@ export const getCalendar = async (startDate?: Date, endDate?: Date): Promise<Cal
     cache: 'no-store',
     headers: headers,
   });
-  if (res.status === 401) throw new Error("Unauthorized");
+  
+  if (res.status === 401) {
+    redirect("/?refresh=true");
+  }
+  
   if (!res.ok) throw new Error('Failed to fetch habit entries for calendar');
   return res.json();
 }
