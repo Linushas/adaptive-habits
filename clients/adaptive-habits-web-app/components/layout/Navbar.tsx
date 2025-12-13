@@ -1,3 +1,4 @@
+import { logoutAction } from "@/app/actions";
 import Image from "next/image";
 
 export function Navbar() {
@@ -33,6 +34,14 @@ export function Navbar() {
                   </a>
                 </li>
               ))}
+
+              <li key={"logout"}>
+                <a onClick={() => logoutAction()}
+                  className="flex items-center gap-2 hover:text-fg/90 transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
+                >
+                  Logout
+                </a>
+              </li>
             </ul>
           </div>
         </div>

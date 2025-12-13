@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 export function proxy(request: NextRequest) {
     const token = request.cookies.get('access_token')?.value
 
-    const publicPaths = ['/login', '/register']
+    const publicPaths = ['/login', '/register'];
     const isPublicPath = publicPaths.includes(request.nextUrl.pathname)
 
     if(!token && !isPublicPath) {
