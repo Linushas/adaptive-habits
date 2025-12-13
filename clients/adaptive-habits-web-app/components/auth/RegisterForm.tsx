@@ -1,15 +1,15 @@
 'use client'
 
-import { startTransition, useActionState, useEffect, useState } from 'react'
-import { loginAction } from '@/app/actions'
+import { useActionState, useEffect, useState } from 'react'
+import { registerAction } from '@/app/actions'
 import { Loader2 } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 
 const initialState = {error: ''}
 
-export function LoginForm() {
-    const [state, formAction, isPending] = useActionState(loginAction, initialState)
+export function RegisterForm() {
+    const [state, formAction, isPending] = useActionState(registerAction, initialState)
     const [errorMessage, setErrorMessage] = useState('')
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export function LoginForm() {
                     </div>
                 )}
 
-                <h2 className="text-fg text-2xl">Login</h2>
+                <h2 className="text-fg text-2xl">Create User</h2>
 
                 <Input
                     id="username"
@@ -57,16 +57,14 @@ export function LoginForm() {
                     {isPending ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Signing in...
+                            Creating user...
                         </>
                     ) : (
                         'Sign in'
                     )}
                 </Button>
-
-            
             </form>
-            <a href="/register" className="text-fg text-sm">Register new user</a>
+            <a href="/login" className="text-fg text-sm">Already registered? click here to sign in</a>
         </>
     )
 }

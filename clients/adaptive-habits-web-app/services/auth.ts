@@ -12,7 +12,7 @@ export const login = async (username: string, password: string) => {
     const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded",
         },
         body: body.toString(),
     });
@@ -22,4 +22,21 @@ export const login = async (username: string, password: string) => {
         throw new Error(errorData.detail || "Invalid credentials");
     }
     return res;
+}
+
+export const register = async (username: string, password: string) => {
+    const body = new URLSearchParams();
+    body.append("username", username);
+    body.append("password", password);
+
+    const res = await fetch(`${API_URL}/auth/register?username=${username}&password=${password}`, {
+        cache: 'no-store',
+        method: "POST"
+    });
+
+    if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Failed to register user");
+    }
+    return res.json();
 }

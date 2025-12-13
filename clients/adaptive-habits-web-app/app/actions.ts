@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { createHabit } from "@/services/habits";
 import { HabitModel } from "@/types";
 import { redirect } from "next/navigation";
-import { login } from "@/services/auth";
+import { login, register } from "@/services/auth";
 
 export async function loginAction(prevState: any, formData: FormData) {
     try {
@@ -36,6 +36,19 @@ export async function loginAction(prevState: any, formData: FormData) {
         return { error: "Login failed" };
     }
 
+    redirect("/");
+}
+
+export async function registerAction(prevState: any, formData: FormData) {
+    try {
+        const username = formData.get("username");
+        const password = formData.get("password");
+        await register(username as string, password as string);
+    } catch (e) {
+        return { error: "Creating new user failed" };
+    }
+
+    await loginAction(prevState, formData);
     redirect("/");
 }
 
