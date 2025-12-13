@@ -9,6 +9,11 @@ class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
+    
+    # timezone: str = Field(default="UTC")
+    timezone: str = Field(default="CET")
+    is_admin: bool = Field(default=False)
+    
 
 ### HABITS ###
 class HabitBase(SQLModel):
