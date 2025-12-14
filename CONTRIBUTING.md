@@ -8,7 +8,7 @@ Contributions of all forms are welcomed. This guide will help you get started.
 This is a monorepo containing both the frontend and backend services:
 
 - **`clients/adaptive-habits-web-app`**: The frontend application (TypeScript, Next.js, React, Tailwind CSS).
-- **`services/process-api-habits`**: The backend API (Python, FastAPI, SQLModel).
+- **`services/habits-service`**: The backend API (Python, FastAPI, SQLModel).
 - **`docs/`**: Documentation.
 - **`resources/`**: Design assets and diagrams.
 
@@ -49,7 +49,7 @@ Please read the **[Setup Guide](docs/SETUP_GUIDE.md)**.
 ## Development Workflow
 
 ### Database
-The project uses a local SQLite database by default (see `services/process-api-habits/app/db.py`).
+The project uses a local SQLite database by default (see `services/habits-service/app/db.py`).
 
 **To reset the database (wipe all data):**
 ```bash
@@ -61,9 +61,8 @@ make db-reset
 - Stack: TypeScript, NEXT.js and Tailwind CSS is used.
 
 ### Backend Development
-- Backend API: `services/process-api-habits`.
+- Backend API: `services/habits-service`.
 - Stack: Python, FastAPI and SQLModel.
-- Authentication: We use JWTs (`python-jose`). If you are modifying auth logic, please check [Architecture Docs](docs/ARCHITECTURE.md) first.
 
 ## Submission Guidelines
 1. **Search Issues:** Check if the issue or feature is already being worked on.
@@ -92,6 +91,5 @@ Automated formatters are used to maintain consistency. Please run ```make format
 ## Documentation
 If you change an API endpoint or add a major feature, please update the relevant documentation:
 - **API Changes:** Update `docs/API_SPECS.md`.
-- **Architectural Changes:** Update `docs/ARCHITECTURE.md`.
 
 Thank you for contributing!

@@ -2,14 +2,12 @@ version: '3.8'
 
 services:
   api:
-    container_name: process-api-habits
+    container_name: habits-service
     build:
-      context: ./services/process-api-habits
+      context: ./services/habits-service
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    # volumes:
-    #   - ./services/process-api-habits:/app
     volumes:
       - habit_data:/data
     environment:
@@ -28,7 +26,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - INTERNAL_API_URL=http://process-api-habits:8000/api/v1
+      - INTERNAL_API_URL=http://habits-service:8000/api/v1
     restart: always
 
 volumes:

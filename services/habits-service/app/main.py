@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan, title="process-api-habits")
+app = FastAPI(lifespan=lifespan, title="habits-service")
 
 origins = (
     settings.ALLOWED_ORIGINS.split(",")
