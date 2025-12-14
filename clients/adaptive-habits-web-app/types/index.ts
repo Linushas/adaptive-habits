@@ -1,8 +1,7 @@
-
 // ---- HABITS ----
 export interface HabitResponse {
   name: string;
-  description?: string
+  description?: string;
   current_target_value: number;
   frequency: string;
   unit?: string;
@@ -10,7 +9,7 @@ export interface HabitResponse {
 
 export interface HabitModel {
   name: string;
-  description?: string
+  description?: string;
   current_target_value: number;
   frequency?: string;
   unit?: string;
@@ -19,25 +18,24 @@ export interface HabitModel {
 // ---- ENTRIES ----
 
 export interface HabitEntry {
-  id: string,
-  habit: HabitModel,
-  log_date: string,
-  value: number,
-  target_snapshot: number,
-  notes?: string,
+  id: string;
+  habit: HabitModel;
+  log_date: string;
+  value: number;
+  target_snapshot: number;
+  notes?: string;
 }
 
 export interface HabitEntryUpdate {
-  id: string,
-  habit?: HabitModel,
-  log_date?: string,
-  value?: number,
-  target_snapshot?: number,
-  notes?: string,
+  id: string;
+  habit?: HabitModel;
+  log_date?: string;
+  value?: number;
+  target_snapshot?: number;
+  notes?: string;
 }
 
 export interface CalendarHabitEntry {
-  log_date: string,
-  completion_percentage: number,
+  log_date: string;
+  completion_percentage: number;
 }
-

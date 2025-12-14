@@ -8,33 +8,40 @@ from app.auth import get_current_user
 
 router = APIRouter()
 
+
 @router.get("/", response_model=List[Habit])
 def read_habits(
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     statement = select(Habit).where(Habit.user_id == current_user.id)
     return session.exec(statement).all()
+
 
 @router.get("/{id}", response_model=Habit)
 def read_habit(
     id: UUID,
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    statement = select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    statement = (
+        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    )
     habit = session.exec(statement).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")
     return habit
 
+
 @router.delete("/{id}", response_model=Habit)
 def delete_habit(
     id: UUID,
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    statement = select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    statement = (
+        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    )
     habit = session.exec(statement).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")
@@ -42,11 +49,12 @@ def delete_habit(
     session.commit()
     return habit
 
+
 @router.post("/", response_model=Habit)
 def create_habit(
     new_habit: HabitCreate,
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     habit = Habit(**new_habit.model_dump(), user_id=current_user.id)
     session.add(habit)
@@ -54,14 +62,17 @@ def create_habit(
     session.refresh(habit)
     return habit
 
+
 @router.put("/{id}", response_model=Habit)
 def update_habit(
     id: UUID,
     habit_update: HabitUpdate,
     session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    statement = select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    statement = (
+        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    )
     habit = session.exec(statement).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")

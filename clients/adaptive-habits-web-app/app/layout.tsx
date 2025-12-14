@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
-import { Navbar } from "@/components/layout/Navbar"
+import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 import Sidepanel from "@/components/ui/Sidepanel";
 import { AgentPanel } from "@/components/layout/AgentPanel";
@@ -23,12 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${instrumentSans.variable} antialiased bg-bg`}
-      >
-        <AppLayout>
-          {children}
-        </AppLayout>
+      <body className={`${instrumentSans.variable} antialiased bg-bg`}>
+        <AppLayout>{children}</AppLayout>
       </body>
     </html>
   );

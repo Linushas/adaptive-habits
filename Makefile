@@ -1,7 +1,7 @@
 include services/process-api-habits/.env
 export
 
-.PHONY: up down db-reset dev
+.PHONY: up down db-reset dev format
 
 up:
 	@echo "Starting app..."
@@ -25,3 +25,9 @@ down:
 
 db-reset:
 	rm -rf ./services/process-api-habits/adaptive_habits.db
+
+format:
+	@echo "Formatting Frontend..."
+	cd ./clients/adaptive-habits-web-app && npm run lint -- --fix && npm run format
+	@echo "Formatting Backend..."
+	cd ./services/process-api-habits && ./venv/bin/black .

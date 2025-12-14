@@ -89,13 +89,13 @@
 
   /*-------------------------------*/
 
-  --bg-dark: hsl(0,0,0);
-  --bg: hsl(0,0,5);
-  --bg-light: hsl(0,0,10);
-  --bg-light-2: hsl(0,0,15);
-  --alt-gray: hsl(0,0,30);
-  --fg-muted: hsl(0,0,70);
-  --fg: hsl(0,0,90);
+  --bg-dark: hsl(0, 0, 0);
+  --bg: hsl(0, 0, 5);
+  --bg-light: hsl(0, 0, 10);
+  --bg-light-2: hsl(0, 0, 15);
+  --alt-gray: hsl(0, 0, 30);
+  --fg-muted: hsl(0, 0, 70);
+  --fg: hsl(0, 0, 90);
 }
 
 .dark {
@@ -133,13 +133,13 @@
 
   /*-------------------------------*/
 
-  --bg-dark: hsl(0,0,0);
-  --bg: hsl(0,0,5);
-  --bg-light: hsl(0,0,10);
-  --bg-light-2: hsl(0,0,15);
-  --alt-gray: hsl(0,0,30);
-  --fg-muted: hsl(0,0,70);
-  --fg: hsl(0,0,90);
+  --bg-dark: hsl(0, 0, 0);
+  --bg: hsl(0, 0, 5);
+  --bg-light: hsl(0, 0, 10);
+  --bg-light-2: hsl(0, 0, 15);
+  --alt-gray: hsl(0, 0, 30);
+  --fg-muted: hsl(0, 0, 70);
+  --fg: hsl(0, 0, 90);
 }
 
 @layer base {

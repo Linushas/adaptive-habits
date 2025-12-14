@@ -4,16 +4,17 @@ from sqlmodel import Field, SQLModel
 from pydantic import BaseModel
 from datetime import datetime, date
 
+
 ### USER ###
 class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
-    
+
     # timezone: str = Field(default="UTC")
     timezone: str = Field(default="CET")
     is_admin: bool = Field(default=False)
-    
+
 
 ### HABITS ###
 class HabitBase(SQLModel):
@@ -23,13 +24,16 @@ class HabitBase(SQLModel):
     frequency: str = "daily"
     unit: Optional[str] = None
 
+
 class Habit(HabitBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 class HabitCreate(HabitBase):
     pass
+
 
 class HabitUpdate(SQLModel):
     name: Optional[str] = None
@@ -37,6 +41,7 @@ class HabitUpdate(SQLModel):
     target_value: Optional[int] = None
     frequency: Optional[str] = None
     unit: Optional[str] = None
+
 
 ### HABIT ENTRIES ###
 class HabitEntryBase(SQLModel):
@@ -46,7 +51,6 @@ class HabitEntryBase(SQLModel):
     target_snapshot: int
     notes: Optional[str] = None
 
-    # OLD: UNIQUE(habit_id, log_date)
 
 class HabitEntryUpdate(SQLModel):
     log_date: Optional[date] = None
@@ -55,19 +59,22 @@ class HabitEntryUpdate(SQLModel):
     notes: Optional[str] = None
     completed_at: Optional[datetime] = None
 
+
 class HabitEntry(HabitEntryBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 class HabitAuditLog(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     habit_id: UUID = Field(foreign_key="habit.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    
+
     previous_target: int
     new_target: int
-    reason: str 
+    reason: str
+
 
 class HabitTodayEntryBase(SQLModel):
     habit: Habit
@@ -84,7 +91,7 @@ class HabitTodayEntry(HabitEntryBase, table=False):
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 class CalendarHabitEntry(BaseModel):
     log_date: date
     completion_percentage: int
-    

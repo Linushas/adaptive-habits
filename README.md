@@ -5,15 +5,17 @@ Habit tracker that adapts to the user's progress. Using algorithm's that decreas
 This project is currently **in development** (not yet MVP stage). The core habit tracking, entry logging, and basic calendar features are functional.
 
 ### Next Steps
-1. User Authentication: Register and Login pages, secure API endpoints with JWT, and remove the development user fallback.
-2. Adaptive Logic: Algorithms to update habit target values.
+1. Adaptive Logic: Algorithms to update habit target values.
+2. Improve client responsiveness for mobile use.
 3. Agent Integration & AI function/tool calling: AI Agent panel to handle natural language requests for logging and modifying habits and entries.
-4. Improve client responsiveness for mobile use.
 
 # Development
 This repo follows a monorepo-structure. 
 - clients/ is where the webapp is located. 
 - services/ contains the backend API's
+
+Get started: [Setup Guide](./docs/SETUP_GUIDE.md)
+Contribute: [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Run dev app
 ```bash
@@ -35,5 +37,3 @@ Clean up with:
 make down
 ```
 
-# Architecture Diagram
-<!-- ![](./resources/architecture_diagram.png) -->
