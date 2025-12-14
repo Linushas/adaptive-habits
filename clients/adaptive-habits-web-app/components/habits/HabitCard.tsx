@@ -7,6 +7,8 @@ import { motion, useSpring, useTransform } from "framer-motion";
 import { HabitEntry, HabitEntryUpdate } from "@/types";
 import { updateHabitEntry } from "@/services/entries";
 import { ta } from "date-fns/locale";
+import { Button } from "../ui/button";
+import { HabitDetails } from "../habit_details_modal/HabitDetails";
 
 interface HabitCardProps {
   title: string;
@@ -83,7 +85,7 @@ export function HabitCard({
     >
       <CardTitle>
         <div className="flex items-center justify-between">
-          <h3>{title}</h3>
+          <HabitDetails entry={habitEntry} />
           {targetValue === 1 ? (
             localValue == 1 ? (
               <span>Done</span>
