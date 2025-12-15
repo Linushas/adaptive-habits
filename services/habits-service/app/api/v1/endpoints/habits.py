@@ -1,9 +1,18 @@
-from typing import List
+from typing import List, Optional, Dict
+from datetime import date, timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
 from app.db import get_session
-from app.models import Habit, User, HabitCreate, HabitUpdate
+from app.models import (
+    Habit,
+    User,
+    HabitCreate,
+    HabitUpdate,
+    HabitDetails,
+    HabitEntryBase,
+    HabitEntry,
+)
 from app.auth import get_current_user
 
 router = APIRouter()
@@ -85,3 +94,34 @@ def update_habit(
     session.commit()
     session.refresh(habit)
     return habit
+
+
+@router.get("/details/{id}", response_model=HabitDetails)
+def get_habit_details(
+    id: UUID,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    statement = (
+        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
+    )
+    habit = session.exec(statement).first()
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+
+    if not start_date or not end_date:
+        return []
+
+    statement = select(HabitEntry).where(
+        HabitEntry.user_id == current_user.id,
+        HabitEntry.habit_id == id,
+        HabitEntry.log_date >= start_date,
+        HabitEntry.log_date <= end_date,
+    )
+    entries: List[HabitEntry] = session.exec(statement).all()
+
+    habit_details = HabitDetails(habit=habit, snapshots=entries)
+
+    return habit_details

@@ -15,11 +15,17 @@ export interface HabitModel {
   unit?: string;
 }
 
+export interface Habit extends HabitModel {
+  id: string;
+  user_id: string;
+  created_at: string;
+}
+
 // ---- ENTRIES ----
 
 export interface HabitEntry {
   id: string;
-  habit: HabitModel;
+  habit: Habit;
   log_date: string;
   value: number;
   target_snapshot: number;
@@ -28,7 +34,7 @@ export interface HabitEntry {
 
 export interface HabitEntryUpdate {
   id: string;
-  habit?: HabitModel;
+  habit?: Habit;
   log_date?: string;
   value?: number;
   target_snapshot?: number;
@@ -38,4 +44,17 @@ export interface HabitEntryUpdate {
 export interface CalendarHabitEntry {
   log_date: string;
   completion_percentage: number;
+}
+
+export interface HabitEntryClean {
+  id: string;
+  log_date: string;
+  value: number;
+  target_snapshot: number;
+  notes?: string;
+}
+
+export interface HabitDetails {
+  habit: Habit;
+  snapshots: HabitEntryClean[];
 }

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel
 from pydantic import BaseModel
@@ -95,3 +95,8 @@ class HabitTodayEntry(HabitEntryBase, table=False):
 class CalendarHabitEntry(BaseModel):
     log_date: date
     completion_percentage: int
+
+
+class HabitDetails(BaseModel):
+    habit: Habit
+    snapshots: List[HabitEntry]

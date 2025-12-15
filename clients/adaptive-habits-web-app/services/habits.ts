@@ -1,7 +1,9 @@
 "use server";
 
-import { HabitModel } from "@/types";
+import { formatDateForApi } from "@/lib/utils";
+import { Habit, HabitDetails, HabitModel } from "@/types";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
@@ -14,7 +16,7 @@ async function getHeaders() {
   };
 }
 
-export const getHabits = async (): Promise<HabitModel[]> => {
+export const getHabits = async (): Promise<Habit[]> => {
   const headers = await getHeaders();
   const res = await fetch(`${API_URL}/habits/`, {
     cache: "no-store",
@@ -33,4 +35,31 @@ export const createHabit = async (habit: HabitModel) => {
   });
   if (!res.ok) throw new Error("Failed to create habit");
   return res.json();
+};
+
+export const getHabitDetails = async (habitId: string) => {
+  const now = new Date();
+  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const startStr = formatDateForApi(monthStartDate);
+  const endStr = formatDateForApi(monthEndDate);
+
+  const headers = await getHeaders();
+  const res = await fetch(
+    `${API_URL}/habits/details/${habitId}?start_date=${startStr}&end_date=${endStr}`,
+    {
+      cache: "no-store",
+      headers: headers,
+    }
+  );
+
+  if (res.status === 401) {
+    redirect("/?refresh=true");
+  }
+
+  if (!res.ok) throw new Error("Failed to fetch habit details");
+  const data = await res.json();
+  // console.log(data);
+  return data;
 };

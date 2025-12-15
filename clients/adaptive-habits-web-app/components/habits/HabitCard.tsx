@@ -6,9 +6,7 @@ import { Card, CardContent, CardTitle } from "../ui/card";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { HabitEntry, HabitEntryUpdate } from "@/types";
 import { updateHabitEntry } from "@/services/entries";
-import { ta } from "date-fns/locale";
-import { Button } from "../ui/button";
-import { HabitDetails } from "../habit_details_modal/HabitDetails";
+import { HabitDetailsModal } from "../habit_details_modal/HabitDetailsModal";
 
 interface HabitCardProps {
   title: string;
@@ -85,7 +83,7 @@ export function HabitCard({
     >
       <CardTitle>
         <div className="flex items-center justify-between">
-          <HabitDetails entry={habitEntry} />
+          <HabitDetailsModal entry={habitEntry} />
           {targetValue === 1 ? (
             localValue == 1 ? (
               <span>Done</span>
