@@ -2,7 +2,6 @@ import * as d3 from "d3";
 
 export interface ChartOptions {
   colors: {
-    background: string;
     grid: string;
     axis: string;
     labels: string;
@@ -50,12 +49,14 @@ export abstract class ChartRenderer {
   protected width: number;
   protected height: number;
   protected padding: number;
+  protected options: ChartOptions;
 
   constructor(element: SVGSVGElement, config: ChartConfig) {
     this.svg = d3.select(element);
     this.width = config.w;
     this.height = config.h;
     this.padding = config.p;
+    this.options = config.options;
   }
 
   public clear() {

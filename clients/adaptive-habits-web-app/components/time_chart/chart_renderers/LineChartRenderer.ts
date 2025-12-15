@@ -8,14 +8,16 @@ export class LineChartRenderer extends ChartRenderer {
     dasharray = false,
     showDots = false,
     xScale: d3.ScaleTime<number, number, never>,
-    yScale: d3.ScaleLinear<number, number, never>
+    yScale: d3.ScaleLinear<number, number, never>,
+    lineColor: string = "white",
+    dotColor: string = "white"
   ) {
     if (dasharray) {
       this.svg
         .append("path")
         .datum(data)
         .attr("fill", "none")
-        .attr("stroke", "rgba(255,255,255,0.4)")
+        .attr("stroke", lineColor)
         .attr("stroke-width", 2)
         .attr("stroke-dasharray", "5,5")
         .attr("d", lineGenerator);
@@ -24,7 +26,7 @@ export class LineChartRenderer extends ChartRenderer {
         .append("path")
         .datum(data)
         .attr("fill", "none")
-        .attr("stroke", "white")
+        .attr("stroke", lineColor)
         .attr("stroke-width", 2)
         .attr("d", lineGenerator);
     }
@@ -32,7 +34,7 @@ export class LineChartRenderer extends ChartRenderer {
     if (showDots) {
       this.svg
         .append("g")
-        .attr("fill", "white")
+        .attr("fill", dotColor)
         .selectAll("circle")
         .data(data)
         .join("circle")
@@ -69,7 +71,7 @@ export class LineChartRenderer extends ChartRenderer {
       .append("g")
       .attr("class", "grid-horizontal")
       .attr("fill", "none")
-      .attr("stroke", "rgba(255,255,255,0.1)")
+      .style("color", this.options.colors.grid)
       .attr("stroke-dasharray", "4,4")
       .call(
         d3
@@ -86,25 +88,18 @@ export class LineChartRenderer extends ChartRenderer {
       .x((d) => xScale(d.date))
       .y((d) => yScale(d.value));
 
-    // data.forEach(dataSet => {
-    //   this.addDataset(dataSet.dataPoints, lineGenerator, false, false, xScale, yScale);
-    // });
-    this.addDataset(
-      data[0].dataPoints,
-      lineGenerator,
-      false,
-      false,
-      xScale,
-      yScale
-    );
-    this.addDataset(
-      data[1].dataPoints,
-      lineGenerator,
-      true,
-      false,
-      xScale,
-      yScale
-    );
+    data.forEach((dataSet) => {
+      this.addDataset(
+        dataSet.dataPoints,
+        lineGenerator,
+        dataSet.options.line.isDashed,
+        dataSet.options.line.showDots,
+        xScale,
+        yScale,
+        dataSet.options.colors.line,
+        dataSet.options.colors.dots
+      );
+    });
 
     if (showAxes) {
       this.svg
@@ -114,7 +109,8 @@ export class LineChartRenderer extends ChartRenderer {
           d3.axisBottom(xScale).ticks(stepSizeX)
           // .tickFormat(d3.timeFormat("%d %b"))
         )
-        .attr("class", "text-white text-xs")
+        .attr("class", "text-xs")
+        .style("color", this.options.colors.labels)
         .style("font-family", "sans-serif")
         .call((g) => g.select(".domain").remove());
 
@@ -122,7 +118,8 @@ export class LineChartRenderer extends ChartRenderer {
         .append("g")
         .attr("transform", `translate(${this.padding},0)`)
         .call(d3.axisLeft(yScale).ticks(stepSizeY))
-        .attr("class", "text-white text-xs")
+        .attr("class", "text-xs")
+        .style("color", this.options.colors.labels)
         .style("font-family", "sans-serif")
         .call((g) => g.select(".domain").remove());
     }

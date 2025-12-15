@@ -13,7 +13,18 @@ interface ProgressChartProps {
 function getDatasetsFromSnapshots(snapshots: HabitEntryClean[]): DataSet[] {
   const dataSets: DataSet[] = [];
 
-  const optionsPreset: DatasetOptions = {
+  const targetOptions: DatasetOptions = {
+    colors: {
+      line: "rgba(255,255,255,0.4)",
+      dots: "rgba(255,255,255,0.4)",
+    },
+    line: {
+      isDashed: true,
+      showDots: false,
+    },
+  };
+
+  const valueOptions: DatasetOptions = {
     colors: {
       line: "#ffffff",
       dots: "#ffffff",
@@ -32,7 +43,7 @@ function getDatasetsFromSnapshots(snapshots: HabitEntryClean[]): DataSet[] {
       };
       return point;
     }),
-    options: optionsPreset,
+    options: valueOptions,
   });
 
   dataSets.push({
@@ -43,7 +54,7 @@ function getDatasetsFromSnapshots(snapshots: HabitEntryClean[]): DataSet[] {
       };
       return point;
     }),
-    options: optionsPreset,
+    options: targetOptions,
   });
 
   console.log(dataSets);

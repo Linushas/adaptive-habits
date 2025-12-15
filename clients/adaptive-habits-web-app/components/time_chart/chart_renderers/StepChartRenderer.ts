@@ -5,14 +5,15 @@ export class StepChartRenderer extends ChartRenderer {
   private addDataset(
     data: DataPoint[],
     lineGenerator: d3.Line<DataPoint>,
-    color: string,
+    lineColor: string = "white",
+    dotColor: string = "white",
     isDashed = false
   ) {
     this.svg
       .append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", color)
+      .attr("stroke", lineColor)
       .attr("stroke-width", 2)
       .attr("stroke-dasharray", isDashed ? "5,5" : "none")
       .attr("d", lineGenerator);
@@ -24,7 +25,7 @@ export class StepChartRenderer extends ChartRenderer {
         .attr("cx", this.xScale(realLastPoint.date))
         .attr("cy", this.yScale(realLastPoint.value))
         .attr("r", 3)
-        .attr("fill", color);
+        .attr("fill", dotColor);
     }
   }
 
@@ -59,7 +60,7 @@ export class StepChartRenderer extends ChartRenderer {
     this.svg
       .append("g")
       .attr("class", "grid-horizontal")
-      .attr("stroke", "rgba(255,255,255,0.1)")
+      .style("color", this.options.colors.grid)
       .attr("stroke-dasharray", "4,4")
       .call(
         d3
@@ -78,9 +79,6 @@ export class StepChartRenderer extends ChartRenderer {
       .curve(d3.curveStepAfter);
 
     data.forEach((dataSet, index) => {
-      const color = index === 0 ? "white" : "rgba(255,255,255,0.4)";
-      const isDashed = index > 0;
-
       const extendedPoints = [...dataSet.dataPoints];
 
       if (extendedPoints.length > 0) {
@@ -91,7 +89,13 @@ export class StepChartRenderer extends ChartRenderer {
         });
       }
 
-      this.addDataset(extendedPoints, lineGenerator, color, isDashed);
+      this.addDataset(
+        extendedPoints,
+        lineGenerator,
+        dataSet.options.colors.line,
+        dataSet.options.colors.dots,
+        dataSet.options.line.isDashed
+      );
     });
 
     this.svg
@@ -101,7 +105,8 @@ export class StepChartRenderer extends ChartRenderer {
         d3.axisBottom(this.xScale).ticks(5)
         // .tickFormat(d3.timeFormat("%d %b") as any)
       )
-      .attr("class", "text-white text-xs")
+      .attr("class", "text-xs")
+      .style("color", this.options.colors.labels)
       .style("font-family", "sans-serif")
       .call((g) => g.select(".domain").remove());
 
@@ -109,7 +114,8 @@ export class StepChartRenderer extends ChartRenderer {
       .append("g")
       .attr("transform", `translate(${this.padding},0)`)
       .call(d3.axisLeft(this.yScale).ticks(5))
-      .attr("class", "text-white text-xs")
+      .attr("class", "text-xs")
+      .style("color", this.options.colors.labels)
       .style("font-family", "sans-serif")
       .call((g) => g.select(".domain").remove());
   }

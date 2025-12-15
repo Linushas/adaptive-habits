@@ -16,7 +16,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
   const [localEntries, setLocalEntries] = useState(entries);
 
   const onSelectedDate = (date: Date | undefined) => {
-    if (!date) return;
+    if (!date || date.valueOf() > new Date().valueOf()) return;
     setSelectedDate(date);
   };
 

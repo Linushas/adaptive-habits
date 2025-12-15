@@ -11,7 +11,6 @@ import {
   ChartRenderer,
   DataSet,
 } from "./chart_renderers/ChartRenderer";
-import { BarChartRenderer } from "./chart_renderers/BarChartRenderer";
 import { HeatmapChartRenderer } from "./chart_renderers/HeatmapChartRenderer";
 import { StepChartRenderer } from "./chart_renderers/StepChartRenderer";
 
@@ -38,8 +37,6 @@ function newRenderer(
   switch (type) {
     case ChartType.LINE:
       return new LineChartRenderer(element, config);
-    case ChartType.BAR:
-      return new BarChartRenderer(element, config);
     case ChartType.HEATMAP:
       return new HeatmapChartRenderer(element, config);
     case ChartType.STEP:
@@ -95,10 +92,9 @@ export const TimeChart = ({
       p: padding,
       options: {
         colors: {
-          background: "transparent",
-          grid: "#000000",
-          axis: "#ffffff",
-          labels: "#ffffff",
+          grid: "rgba(255,255,255,0.1)",
+          axis: "rgba(255,255,255,0.7)",
+          labels: "rgba(255,255,255,0.7)",
         },
         axis: {
           showX: true,
