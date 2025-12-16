@@ -9,12 +9,12 @@ from app.models import (
     HabitEntryBase,
     User,
     HabitEntryUpdate,
-    HabitTodayEntryBase,
     HabitTodayEntry,
     Habit,
     CalendarHabitEntry,
 )
 from app.auth import get_current_user
+from app.target_calculation import calculate_next_target
 
 router = APIRouter()
 
@@ -37,7 +37,8 @@ def create_habit_entry(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    entry = HabitEntryBase(**new_entry.model_dump(), user_id=current_user.id)
+    # entry = HabitEntryBase(**new_entry.model_dump(), user_id=current_user.id)
+    entry = HabitEntry(**new_entry.model_dump(), user_id=current_user.id)
     session.add(entry)
     session.commit()
     session.refresh(entry)
@@ -56,18 +57,68 @@ def update_habit_entry(
         .where(HabitEntry.user_id == current_user.id)
         .where(HabitEntry.id == id)
     )
-    habit = session.exec(statement).first()
-    if not habit:
+    habit_entry: HabitEntry = session.exec(statement).first()
+    if not habit_entry:
         raise HTTPException(status_code=404, detail="Habit entry not found")
 
     entry_data = entry_update.model_dump(exclude_unset=True)
     for key, value in entry_data.items():
-        setattr(habit, key, value)
+        setattr(habit_entry, key, value)
 
-    session.add(habit)
+    session.add(habit_entry)
     session.commit()
-    session.refresh(habit)
-    return habit
+    session.refresh(habit_entry)
+
+    ### Target adaption
+    statement = (
+        select(Habit)
+        .where(Habit.user_id == current_user.id)
+        .where(Habit.id == habit_entry.habit_id)
+    )
+    habit: Habit = session.exec(statement).first()
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+
+    statement = (
+        select(HabitEntry)
+        .where(
+            HabitEntry.user_id == current_user.id,
+            HabitEntry.habit_id == habit_entry.habit_id,
+            HabitEntry.log_date <= date.today(),
+            HabitEntry.log_date >= (habit_entry.log_date - timedelta(days=30)),
+        )
+        .order_by(HabitEntry.log_date)
+    )
+
+    history: List[HabitEntry] = session.exec(statement).all()
+    next_target: int = calculate_next_target(history)
+
+    if habit.current_target_value != next_target and next_target:
+        habit.current_target_value = next_target
+        session.add(habit)
+        session.commit()
+
+        tomorrow = date.today() + timedelta(1)
+        statement = select(HabitEntry).where(
+            HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == tomorrow
+        )
+        entry: HabitEntry = session.exec(statement).first()
+        if entry:
+            entry.target_snapshot = next_target
+            session.add(entry)
+            session.commit()
+        else:
+            entry = HabitEntry(
+                habit_id=habit_entry.habit_id,
+                log_date=tomorrow,
+                target_snapshot=next_target,
+                value=0,
+                user_id=current_user.id,
+            )
+            session.add(entry)
+            session.commit()
+
+    return habit_entry
 
 
 @router.get("/today", response_model=List[HabitTodayEntry])
@@ -80,7 +131,7 @@ def get_todays_entries(
     if selected_date:
         today: date = selected_date
 
-    print(today)
+    # print(today)
 
     todays_entries: List[HabitTodayEntry] = []
 
@@ -88,14 +139,19 @@ def get_todays_entries(
         select(Habit).where(Habit.user_id == current_user.id)
     ).all()
 
+    statement = select(HabitEntry).where(
+        HabitEntry.user_id == current_user.id, HabitEntry.log_date == today
+    )
+    all_entries: List[HabitEntry] = session.exec(statement).all()
+    entries_map: Dict[UUID, HabitEntry] = {
+        entry.habit_id: entry for entry in all_entries
+    }
+
     for habit in habits:
         if habit.created_at.date() > today:
             continue
 
-        statement = select(HabitEntry).where(
-            HabitEntry.habit_id == habit.id, HabitEntry.log_date == today
-        )
-        entry: HabitEntry = session.exec(statement).first()
+        entry = entries_map.get(habit.id)
 
         if not entry:
             entry = HabitEntry(

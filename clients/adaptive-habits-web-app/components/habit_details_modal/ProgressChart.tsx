@@ -37,24 +37,29 @@ function getDatasetsFromSnapshots(snapshots: HabitEntryClean[]): DataSet[] {
   };
 
   dataSets.push({
-    dataPoints: snapshots.map((v, i) => {
+    dataPoints: snapshots.flatMap((v) => {
       const point: DataPoint = {
         date: new Date(v.log_date),
         value: v.value,
       };
-      return point;
+
+      if (point.date <= new Date()) {
+        return [point];
+      } else {
+        return [];
+      }
     }),
     options: valueOptions,
   });
   dataSets[0].dataPoints.sort((a, b) => a.date.valueOf() - b.date.valueOf());
 
   dataSets.push({
-    dataPoints: snapshots.map((v, i) => {
+    dataPoints: snapshots.flatMap((v) => {
       const point: DataPoint = {
         date: new Date(v.log_date),
         value: v.target_snapshot,
       };
-      return point;
+      return [point];
     }),
     options: targetOptions,
   });

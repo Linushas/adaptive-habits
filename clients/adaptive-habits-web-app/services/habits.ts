@@ -39,11 +39,13 @@ export const createHabit = async (habit: HabitModel) => {
 
 export const getHabitDetails = async (habitId: string) => {
   const now = new Date();
-  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const start = new Date(tomorrow);
+  start.setDate(now.getDate() - 30);
 
-  const startStr = formatDateForApi(monthStartDate);
-  const endStr = formatDateForApi(monthEndDate);
+  const startStr = formatDateForApi(start);
+  const endStr = formatDateForApi(tomorrow);
 
   const headers = await getHeaders();
   const res = await fetch(

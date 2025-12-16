@@ -59,7 +59,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
                     <HabitCard
                       title={entry.habit.name}
                       value={entry.value}
-                      targetValue={entry.habit.current_target_value}
+                      targetValue={entry.target_snapshot}
                       habitEntry={entry}
                       unit={entry.habit.unit}
                     />

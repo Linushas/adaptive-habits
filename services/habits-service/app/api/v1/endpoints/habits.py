@@ -1,5 +1,5 @@
-from typing import List, Optional, Dict
-from datetime import date, timedelta
+from typing import List, Optional
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
@@ -10,7 +10,6 @@ from app.models import (
     HabitCreate,
     HabitUpdate,
     HabitDetails,
-    HabitEntryBase,
     HabitEntry,
 )
 from app.auth import get_current_user
