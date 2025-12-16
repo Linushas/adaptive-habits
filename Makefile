@@ -21,7 +21,7 @@ clean:
 
 down:
 	@echo "Stopping backend..."
-	docker compose down
+	docker compose down -v
 
 db-reset:
 	rm -rf ./services/habits-service/adaptive_habits.db
