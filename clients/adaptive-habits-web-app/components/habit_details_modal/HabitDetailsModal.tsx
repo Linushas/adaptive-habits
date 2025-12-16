@@ -16,6 +16,7 @@ import { ProgressChart } from "./ProgressChart";
 import { getHabitDetails } from "@/services/habits";
 import { HabitControls } from "./HabitControls";
 import { useState } from "react";
+import { ChartType } from "../time_chart/TimeChart";
 
 interface HabitDetailsProps {
   entry: HabitEntry;
@@ -24,6 +25,7 @@ interface HabitDetailsProps {
 export function HabitDetailsModal({ entry }: HabitDetailsProps) {
   const [habitDetails, setHabitDetails] = useState<HabitDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  const [chartType, setChartType] = useState(ChartType.STEP);
 
   async function fetchHabitDetails() {
     if (habitDetails) return;
@@ -77,26 +79,42 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
           </Button>
         </div>
       </DialogTrigger>
-      <DialogContent className="min-w-[80%] max-w-[80%] h-[80%]">
-          {habitDetails ? (
-            <HabitControls habit={habitDetails.habit} />
-          ) : (
-            <DialogTitle className="text-fg">Loading...</DialogTitle>
-          )}
+      <DialogContent className="min-w-[80%] max-w-[80%] h-[80%] align-top">
+        {habitDetails ? (
+          <HabitControls habit={habitDetails.habit} />
+        ) : (
+          <DialogTitle className="text-fg">Loading...</DialogTitle>
+        )}
 
-          <div className="space-y-2 border-t border-fg-muted/10 pt-4">
-            <h3 className="font-bold text-fg">Description & Goals</h3>
-            <span className="text-sm text-fg">
-              {habitDetails ? habitDetails.habit.description : "Loading..."}
-            </span>
-          </div>
+        <div className="space-y-2 border-t border-fg-muted/10 pt-4">
+          <h3 className="font-bold text-fg">Description & Goals</h3>
+          <span className="text-sm text-fg">
+            {habitDetails ? habitDetails.habit.description : "Loading..."}
+          </span>
+        </div>
 
-          {habitDetails ? (
-            <ProgressChart snapshots={habitDetails.snapshots} />
-          ) : (
-            <></>
-          )}
-        <DialogFooter></DialogFooter>
+        {habitDetails ? (
+          <ProgressChart
+            key={chartType}
+            snapshots={habitDetails.snapshots}
+            type={chartType}
+          />
+        ) : (
+          <div className="max-h-90 h-full bg-bg-light-2 rounded-lg max-w-full w-full overflow-hidden transition-none"></div>
+        )}
+        <DialogFooter>
+          <Button
+            variant={"ghost"}
+            className="text-fg"
+            onClick={() =>
+              setChartType(
+                chartType == ChartType.LINE ? ChartType.STEP : ChartType.LINE
+              )
+            }
+          >
+            Switch Chart Type
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

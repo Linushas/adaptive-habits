@@ -24,7 +24,6 @@ interface ChartProps {
 
 export enum ChartType {
   LINE,
-  BAR,
   HEATMAP,
   STEP,
 }

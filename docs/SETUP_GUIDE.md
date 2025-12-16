@@ -43,5 +43,5 @@ make down
 ├── **clients**
 │   └── **adaptive-habits-web-app**
 └── **services**
-    └── **process-api-habits**
+    └── **habits-service**
 ```
