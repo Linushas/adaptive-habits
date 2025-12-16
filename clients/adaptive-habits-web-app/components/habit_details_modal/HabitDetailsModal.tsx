@@ -78,24 +78,24 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
         </div>
       </DialogTrigger>
       <DialogContent className="min-w-[80%] max-w-[80%] h-[80%]">
-        {habitDetails ? (
-          <HabitControls habit={habitDetails.habit} />
-        ) : (
-          <DialogTitle className="text-fg">Loading...</DialogTitle>
-        )}
+          {habitDetails ? (
+            <HabitControls habit={habitDetails.habit} />
+          ) : (
+            <DialogTitle className="text-fg">Loading...</DialogTitle>
+          )}
 
-        <div className="space-y-2 border-t border-fg-muted/10 pt-4">
-          <h3 className="font-bold text-fg">Description & Goals</h3>
-          <span className="text-sm text-fg">
-            {habitDetails ? habitDetails.habit.description : "Loading..."}
-          </span>
-        </div>
+          <div className="space-y-2 border-t border-fg-muted/10 pt-4">
+            <h3 className="font-bold text-fg">Description & Goals</h3>
+            <span className="text-sm text-fg">
+              {habitDetails ? habitDetails.habit.description : "Loading..."}
+            </span>
+          </div>
 
-        {habitDetails ? (
-          <ProgressChart snapshots={habitDetails.snapshots} />
-        ) : (
-          <></>
-        )}
+          {habitDetails ? (
+            <ProgressChart snapshots={habitDetails.snapshots} />
+          ) : (
+            <></>
+          )}
         <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>

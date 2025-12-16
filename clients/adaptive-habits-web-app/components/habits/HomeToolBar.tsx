@@ -45,9 +45,10 @@ export function HomeToolBar({
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+        <PopoverContent className="w-auto overflow-hidden p-0 border border-fg-muted/20 bg-bg-light-2" align="start">
           <Calendar
             mode="single"
+            className="bg-bg-light-2"
             selected={selectedDate}
             captionLayout="dropdown"
             onSelect={(date) => {

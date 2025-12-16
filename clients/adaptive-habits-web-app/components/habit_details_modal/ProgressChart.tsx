@@ -135,9 +135,11 @@ export function ProgressChart({ snapshots }: ProgressChartProps) {
   // const dataSets: DataSet[] = [data, data2]
 
   return (
-    <TimeChart
-      dataSets={getDatasetsFromSnapshots(snapshots)}
-      type={ChartType.LINE}
-    />
+    <div className="w-full">
+      <TimeChart
+        dataSets={getDatasetsFromSnapshots(snapshots)}
+        type={ChartType.LINE}
+      />
+    </div>
   );
 }

@@ -118,7 +118,7 @@ export const TimeChart = ({
   return (
     <div
       ref={containerRef}
-      className="max-h-90 h-full bg-bg-light-2 rounded-md max-w-full w-full overflow-hidden"
+      className="max-h-90 h-full bg-bg-light-2 rounded-lg max-w-full w-full overflow-hidden"
     >
       {dimensions.width > 0 && (
         <svg ref={svgRef} width={dimensions.width} height={dimensions.height} />
