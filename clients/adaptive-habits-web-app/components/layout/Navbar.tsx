@@ -15,9 +15,9 @@ export function Navbar() {
         <div className="flex items-center bg-transparent justify-between h-16">
           <a href={"/"}>
             <Image
-              src="/ah-logo.png"
+              src="/adaptive_habits_logo.png"
               alt="Adaptive Habits Logo"
-              width={64}
+              width={32}
               height={8}
             />
           </a>

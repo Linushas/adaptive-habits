@@ -37,6 +37,16 @@ export const createHabit = async (habit: HabitModel) => {
   return res.json();
 };
 
+export const deleteHabit = async (habitId: string) => {
+  const headers = await getHeaders();
+  const res = await fetch(`${API_URL}/habits/${habitId}`, {
+    method: "DELETE",
+    headers: headers
+  });
+  if (!res.ok) throw new Error("Failed to delete habit");
+  return res.json();
+};
+
 export const getHabitDetails = async (habitId: string) => {
   const now = new Date();
   const tomorrow = new Date(now);

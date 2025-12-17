@@ -22,16 +22,16 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 const formSchema = z.object({
   name: z
     .string()
-    .min(0, "Habit name must be at least 5 characters.")
-    .max(50, "Habit name must be at most 32 characters."),
+    .min(0, "Habit name must be at least 0 characters.")
+    .max(100, "Habit name must be at most 100 characters."),
   current_target_value: z.coerce
     .number()
-    .min(1, "Target value must be at least 20.")
-    .max(100, "Target value must be at least 100."),
+    .min(1, "Target value must be at least 1.")
+    .max(10000, "Target value must be at most 10000."),
   unit: z
     .string()
     .min(0, "Unit must be at least 0 characters.")
-    .max(50, "Unit must be at most 50 characters."),
+    .max(100, "Unit must be at most 100 characters."),
 });
 
 export function NewHabitDialog() {
@@ -106,7 +106,7 @@ export function NewHabitDialog() {
                     id="form-rhf-demo-target-value"
                     aria-invalid={fieldState.invalid}
                     min={1}
-                    max={100}
+                    max={10000}
                     type="number"
                     placeholder="12"
                     autoComplete="off"

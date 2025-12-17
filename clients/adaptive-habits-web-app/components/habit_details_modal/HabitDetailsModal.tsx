@@ -17,6 +17,7 @@ import { getHabitDetails } from "@/services/habits";
 import { HabitControls } from "./HabitControls";
 import { useState } from "react";
 import { ChartType } from "../time_chart/TimeChart";
+import { deleteHabitAction } from "@/app/actions";
 
 interface HabitDetailsProps {
   entry: HabitEntry;
@@ -113,6 +114,12 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
             }
           >
             Switch Chart Type
+          </Button>
+          <Button
+            variant={"primary"}
+            onClick={async () => await deleteHabitAction(entry.habit.id)}
+          >
+            Delete Habit
           </Button>
         </DialogFooter>
       </DialogContent>

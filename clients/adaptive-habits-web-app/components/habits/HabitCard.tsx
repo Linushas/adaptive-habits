@@ -7,6 +7,7 @@ import { motion, useSpring, useTransform } from "framer-motion";
 import { HabitEntry, HabitEntryUpdate } from "@/types";
 import { updateHabitEntry } from "@/services/entries";
 import { HabitDetailsModal } from "../habit_details_modal/HabitDetailsModal";
+import { Input } from "../ui/input";
 
 interface HabitCardProps {
   title: string;
@@ -26,6 +27,9 @@ export function HabitCard({
   className,
 }: HabitCardProps) {
   const [localValue, setLocalValue] = useState(value);
+  const [isInputOpen, setIsInputOpen] = useState(false);
+  const maxValue=10000;
+  const minValue=0;
 
   useEffect(() => {
     setLocalValue(value);
@@ -92,8 +96,35 @@ export function HabitCard({
             )
           ) : (
             <div className="flex gap-1 font-mono tabular-nums">
-              <motion.span>{displayValue}</motion.span>
-              <span>
+              {isInputOpen ?(
+                <Input 
+                  className="max-w-20 m-auto h-8"
+                  type="number"
+                  min={minValue}
+                  max={maxValue}
+                  autoFocus
+                  defaultValue={localValue}
+                  onChange={(e) => {
+                    let val = parseInt(e.target.value);
+                    if(val>=maxValue) val=maxValue;
+                    else if(val<=minValue) val=minValue;
+                    if(!isNaN(val)) setLocalValue(val);
+                  }}
+                  onBlur={() => {
+                    setIsInputOpen(false);
+                    onValueChange(localValue);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setIsInputOpen(false);
+                      onValueChange(localValue);
+                    }
+                  }}
+                />
+              ):(
+                <motion.span className="m-auto hover:text-fg-muted/40 cursor-text" onClick={() => setIsInputOpen(true)}>{displayValue}</motion.span>
+              )}
+              <span className="m-auto">
                 / {targetValue} {unit != null ? unit : ""}
               </span>
             </div>

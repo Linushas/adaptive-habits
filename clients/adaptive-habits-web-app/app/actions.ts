@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { createHabit } from "@/services/habits";
+import { createHabit, deleteHabit } from "@/services/habits";
 import { HabitModel } from "@/types";
 import { redirect } from "next/navigation";
 import { login, register } from "@/services/auth";
@@ -71,6 +71,9 @@ export async function addHabitAction(habit: HabitModel) {
   revalidatePath("/");
 }
 
-// deleteHabitAction
+export async function deleteHabitAction(habitId: string) {
+  await deleteHabit(habitId);
+  revalidatePath("/");
+}
 
 // updateHabitAction
