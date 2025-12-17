@@ -20,9 +20,8 @@ router = APIRouter()
 
 
 def get_today() -> date:
-    time_zone = timezone(timedelta(hours=1)) 
+    time_zone = timezone(timedelta(hours=1))
     return datetime.now(time_zone).date()
-
 
 
 @router.get("/", response_model=List[HabitEntry])

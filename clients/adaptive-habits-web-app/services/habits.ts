@@ -27,7 +27,7 @@ export const deleteHabit = async (habitId: string) => {
 export const getHabitDetails = async (
   habitId: string
 ): Promise<HabitDetails> => {
-  const now = getToday()
+  const now = getToday();
   const tomorrow = new Date(now);
   tomorrow.setDate(now.getDate() + 1);
   const start = new Date(tomorrow);

@@ -8,7 +8,7 @@ export const getTodaysEntries = async (
   selectedDate?: Date
 ): Promise<HabitEntry[]> => {
   if (!selectedDate) {
-    selectedDate = getToday()
+    selectedDate = getToday();
   }
 
   return apiClient<HabitEntry[]>("/entries/today", {
