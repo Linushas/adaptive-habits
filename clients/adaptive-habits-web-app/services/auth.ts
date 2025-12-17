@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { apiClient } from "@/lib/api";
 
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,21 +25,12 @@ export const login = async (username: string, password: string) => {
 };
 
 export const register = async (username: string, password: string) => {
-  const body = new URLSearchParams();
-  body.append("username", username);
-  body.append("password", password);
-
-  const res = await fetch(
-    `${API_URL}/auth/register?username=${username}&password=${password}`,
-    {
-      cache: "no-store",
-      method: "POST",
-    }
-  );
-
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.detail || "Failed to register user");
-  }
-  return res.json();
+  return apiClient<void>("/auth/register", {
+    params: {
+      username: username,
+      password: password,
+    },
+    cache: "no-store",
+    method: "POST",
+  });
 };

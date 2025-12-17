@@ -2,19 +2,7 @@
 
 import { CalendarHabitEntry, HabitEntry, HabitEntryUpdate } from "@/types";
 import { formatDateForApi } from "@/lib/utils";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-
-const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
-
-async function getHeaders() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
-  return {
-    "Content-Type": "application/json",
-    Cookie: `access_token=${token}`,
-  };
-}
+import { apiClient } from "@/lib/api";
 
 export const getTodaysEntries = async (
   selectedDate?: Date
@@ -23,37 +11,20 @@ export const getTodaysEntries = async (
     selectedDate = new Date();
   }
 
-  const headers = await getHeaders();
-  const res = await fetch(
-    `${API_URL}/entries/today?selected_date=${formatDateForApi(selectedDate)}`,
-    {
-      cache: "no-store",
-      headers: headers,
-    }
-  );
-
-  if (res.status === 401) {
-    redirect("/?refresh=true");
-  }
-
-  if (!res.ok) throw new Error("Failed to fetch habit entries");
-  return res.json();
+  return apiClient<HabitEntry[]>("/entries/today", {
+    params: {
+      selected_date: formatDateForApi(selectedDate),
+    },
+    cache: "no-store",
+  });
 };
 
 export const updateHabitEntry = async (entry: HabitEntryUpdate) => {
-  const headers = await getHeaders();
-  const res = await fetch(`${API_URL}/entries/${entry.id}`, {
+  return apiClient(`/entries/${entry.id}`, {
     method: "PUT",
-    headers: headers,
+    cache: "no-store",
     body: JSON.stringify(entry),
   });
-
-  if (res.status === 401) {
-    redirect("/?refresh=true");
-  }
-
-  if (!res.ok) throw new Error("Failed to update habit entry");
-  return res.json();
 };
 
 export const getCalendar = async (
@@ -71,19 +42,11 @@ export const getCalendar = async (
     endStr = formatDateForApi(endDate);
   }
 
-  const headers = await getHeaders();
-  const res = await fetch(
-    `${API_URL}/entries/calendar?start_date=${startStr}&end_date=${endStr}`,
-    {
-      cache: "no-store",
-      headers: headers,
-    }
-  );
-
-  if (res.status === 401) {
-    redirect("/?refresh=true");
-  }
-
-  if (!res.ok) throw new Error("Failed to fetch habit entries for calendar");
-  return res.json();
+  return apiClient<CalendarHabitEntry[]>("/entries/calendar", {
+    params: {
+      start_date: startStr,
+      end_date: endStr,
+    },
+    cache: "no-store",
+  });
 };
