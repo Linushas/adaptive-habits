@@ -5,6 +5,7 @@ import CalendarGrid from "./Calendar";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { getCalendar } from "@/services/entries";
+import { getToday } from "@/lib/utils";
 
 export interface CalendarProps {
   entries: CalendarHabitEntry[];
@@ -26,8 +27,8 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
     "November",
     "December",
   ];
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(getToday().getMonth());
+  const [year, setYear] = useState(getToday().getFullYear());
 
   async function onMonthChange(direction: string) {
     let newYear = year;

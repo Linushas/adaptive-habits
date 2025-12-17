@@ -1,5 +1,5 @@
 from typing import List, Optional, Dict
-from datetime import date, timedelta
+from datetime import date, timedelta, timezone, datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
@@ -17,6 +17,12 @@ from app.auth import get_current_user
 from app.target_calculation import calculate_next_target
 
 router = APIRouter()
+
+
+def get_today() -> date:
+    time_zone = timezone(timedelta(hours=1)) 
+    return datetime.now(time_zone).date()
+
 
 
 @router.get("/", response_model=List[HabitEntry])
@@ -84,7 +90,7 @@ def update_habit_entry(
         .where(
             HabitEntry.user_id == current_user.id,
             HabitEntry.habit_id == habit_entry.habit_id,
-            HabitEntry.log_date <= date.today(),
+            HabitEntry.log_date <= get_today(),
             HabitEntry.log_date >= (habit_entry.log_date - timedelta(days=30)),
         )
         .order_by(HabitEntry.log_date)
@@ -98,7 +104,7 @@ def update_habit_entry(
         session.add(habit)
         session.commit()
 
-        tomorrow = date.today() + timedelta(1)
+        tomorrow = get_today() + timedelta(1)
         statement = select(HabitEntry).where(
             HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == tomorrow
         )
@@ -127,7 +133,7 @@ def get_todays_entries(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    today = date.today()
+    today = get_today()
     if selected_date:
         today: date = selected_date
 

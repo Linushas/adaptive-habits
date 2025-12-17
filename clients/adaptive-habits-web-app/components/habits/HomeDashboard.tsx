@@ -2,6 +2,7 @@
 
 import { HabitCard } from "@/components/habits/HabitCard";
 import { HomeToolBar } from "@/components/habits/HomeToolBar";
+import { getToday } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
 import { useEffect, useState, useCallback } from "react";
@@ -11,12 +12,12 @@ interface HomeDashboardProps {
 }
 
 export default function HomeDashboard({ entries }: HomeDashboardProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(getToday());
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState(entries);
 
   const onSelectedDate = (date: Date | undefined) => {
-    if (!date || date.valueOf() > new Date().valueOf()) return;
+    if (!date || date.valueOf() > getToday().valueOf()) return;
     setSelectedDate(date);
   };
 

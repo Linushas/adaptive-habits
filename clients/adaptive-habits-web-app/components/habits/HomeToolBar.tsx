@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { getToday } from "@/lib/utils";
 
 interface ToolBarProps {
   hideCompleted: boolean;
@@ -38,7 +39,7 @@ export function HomeToolBar({
             className="w-48 justify-between font-normal m-auto"
           >
             {selectedDate
-              ? selectedDate.getDate() == new Date().getDate()
+              ? selectedDate.getDate() == getToday().getDate()
                 ? "Today"
                 : selectedDate.toDateString()
               : "Select date"}
@@ -64,7 +65,7 @@ export function HomeToolBar({
 
       <h2 className="text-2xl font-bold m-auto">
         {selectedDate
-          ? selectedDate.getDate() == new Date().getDate()
+          ? selectedDate.getDate() == getToday().getDate()
             ? "Today"
             : selectedDate.toDateString()
           : ""}

@@ -1,3 +1,4 @@
+import { getToday } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { CalendarProps } from "./CalendarDashboard";
 import { CalendarHabitEntry } from "@/types/index";
@@ -7,7 +8,7 @@ interface ProgressPieChartProps {
   percentage: number;
 }
 
-const today: Date = new Date();
+const today: Date = getToday();
 
 function ProgressPieChart({ percentage }: ProgressPieChartProps) {
   const radius = 10;

@@ -11,3 +11,9 @@ export function formatDateForApi(date: Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+export function getToday(): Date {
+  const timeZone = "Europe/Stockholm";
+  const timeStr = new Date().toLocaleString("en-US", { timeZone: timeZone });
+  return new Date(timeStr);
+}

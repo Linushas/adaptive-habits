@@ -5,6 +5,7 @@ import {
   DataPoint,
   DatasetOptions,
 } from "../time_chart/chart_renderers/ChartRenderer";
+import { getToday } from "@/lib/utils";
 
 interface ProgressChartProps {
   snapshots: HabitEntryClean[];
@@ -43,7 +44,7 @@ function getDatasetsFromSnapshots(snapshots: HabitEntryClean[]): DataSet[] {
         value: v.value,
       };
 
-      if (point.date <= new Date()) {
+      if (point.date <= getToday()) {
         return [point];
       } else {
         return [];
