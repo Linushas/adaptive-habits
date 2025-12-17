@@ -82,7 +82,7 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
       </DialogTrigger>
       <DialogContent className="min-w-[80%] max-w-[80%] h-[80%] align-top">
         {habitDetails ? (
-          <HabitControls habit={habitDetails.habit} />
+          <HabitControls habit={habitDetails.habit} todaysEntry={entry} />
         ) : (
           <DialogTitle className="text-fg">Loading...</DialogTitle>
         )}

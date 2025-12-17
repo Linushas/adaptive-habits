@@ -4,9 +4,10 @@ import { DialogTitle } from "../ui/dialog";
 
 interface HabitControlsProps {
   habit: HabitModel;
+  todaysEntry: HabitEntry;
 }
 
-export function HabitControls({ habit }: HabitControlsProps) {
+export function HabitControls({ habit, todaysEntry }: HabitControlsProps) {
   return (
     <div className="flex pb-0 m-0">
       <DialogTitle className="text-3xl">{habit.name}</DialogTitle>
@@ -14,7 +15,7 @@ export function HabitControls({ habit }: HabitControlsProps) {
       <div className="flex m-auto space-x-16">
         <div className="space-y-3 text-center">
           <h5 className="font-bold text-fg">Current Target</h5>
-          <span className="text-fg-muted">{habit.current_target_value}</span>
+          <span className="text-fg-muted">{todaysEntry.target_snapshot}</span>
         </div>
 
         <div className="space-y-2 text-center items-center">

@@ -41,7 +41,7 @@ export const deleteHabit = async (habitId: string) => {
   const headers = await getHeaders();
   const res = await fetch(`${API_URL}/habits/${habitId}`, {
     method: "DELETE",
-    headers: headers
+    headers: headers,
   });
   if (!res.ok) throw new Error("Failed to delete habit");
   return res.json();

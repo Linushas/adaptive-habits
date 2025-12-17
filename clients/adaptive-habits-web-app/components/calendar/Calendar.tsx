@@ -78,7 +78,7 @@ function CalendarCard({ log_date, completion_percentage }: CalendarHabitEntry) {
             <ProgressPieChart percentage={pie_percentage} />
           </div>
           <span className="text-[10px] text-fg-muted font-semibold leading-none opacity-90">
-            {completion_percentage != 100 ? (
+            {completion_percentage < 100 ? (
               completion_percentage + "%"
             ) : (
               <svg

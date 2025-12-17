@@ -7,7 +7,7 @@ import Sidepanel from "@/components/ui/Sidepanel";
 import { AgentPanel } from "@/components/layout/AgentPanel";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const [isSidepanelOpen, setIsSidepanelOpen] = useState(true);
+  const [isSidepanelOpen, setIsSidepanelOpen] = useState(false);
   const pathname = usePathname();
   const publicPaths = ["/login", "/register"];
   const isPublicPath = publicPaths.includes(pathname);

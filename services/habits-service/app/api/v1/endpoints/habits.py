@@ -53,6 +53,11 @@ def delete_habit(
     habit = session.exec(statement).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")
+
+    # statement = (select(HabitEntry).where(HabitEntry.habit_id == id))
+    # entries: List[HabitEntry] = session.exec(statement).all()
+    # session.delete(entries)
+
     session.delete(habit)
     session.commit()
     return habit

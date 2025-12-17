@@ -1,6 +1,6 @@
 from typing import Optional, List
 from uuid import UUID, uuid4
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
 from datetime import datetime, date
 
@@ -29,6 +29,10 @@ class Habit(HabitBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    entries: List["HabitEntry"] = Relationship(
+        back_populates="habit", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
 
 
 class HabitCreate(HabitBase):
@@ -65,15 +69,7 @@ class HabitEntry(HabitEntryBase, table=True):
     user_id: UUID = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-
-class HabitAuditLog(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-    habit_id: UUID = Field(foreign_key="habit.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
-    previous_target: int
-    new_target: int
-    reason: str
+    habit: Habit = Relationship(back_populates="entries")
 
 
 class HabitTodayEntryBase(SQLModel):
