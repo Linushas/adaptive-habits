@@ -27,9 +27,13 @@ def create_token(data: dict, type: str):  # not dict, use pydantic model?
     to_encode = data.copy()
     expire: datetime = None
     if type == "access":
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        )
     elif type == "refresh":
-        expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(
+            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
+        )
     else:
         return
     to_encode.update({"exp": expire, "type": type})
@@ -59,16 +63,12 @@ def validate_token(token: str) -> User:
     except JWTError:
         raise credentials_exception
 
-    user = User(
-        id=UUID(user_id),
-        username=username,
-        hashed_password="" 
-    )
+    user = User(id=UUID(user_id), username=username, hashed_password="")
 
     return user
 
 
-def get_current_user( # needs better error handling
+def get_current_user(  # needs better error handling
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
 ):

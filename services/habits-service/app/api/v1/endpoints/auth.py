@@ -20,6 +20,7 @@ router = APIRouter()
 ACCESS_TOKEN_AGE = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
 REFRESH_TOKEN_AGE = settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
 
+
 @router.post("/register")
 def register(username: str, password: str, session: Session = Depends(get_session)):
     statement = select(User).where(User.username == username)
@@ -43,7 +44,6 @@ def login(
 
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-
 
     token_payload = {
         "sub": user.username,
@@ -73,20 +73,15 @@ def login(
 
 
 @router.post("/refresh")
-def refresh(
-    request: Request, response: Response
-):
+def refresh(request: Request, response: Response):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token missing")
 
     try:
         user: User = validate_token(refresh_token)
-        
-        token_payload = {
-            "sub": user.username,
-            "id": str(user.id)
-        }
+
+        token_payload = {"sub": user.username, "id": str(user.id)}
         access_token = create_access_token(data=token_payload)
 
         response.set_cookie(

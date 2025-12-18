@@ -11,7 +11,7 @@ class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
-    
+
     is_admin: bool = Field(default=False)
 
 

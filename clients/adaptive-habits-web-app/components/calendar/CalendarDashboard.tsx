@@ -17,7 +17,11 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
   useEffect(() => {
     const onFocus = () => {
       const newToday = new Date();
-      if (newToday.getDate() !== today.getDate() || newToday.getMonth() !== today.getMonth() || newToday.getFullYear() !== today.getFullYear()) {
+      if (
+        newToday.getDate() !== today.getDate() ||
+        newToday.getMonth() !== today.getMonth() ||
+        newToday.getFullYear() !== today.getFullYear()
+      ) {
         setToday(newToday);
       }
     };
@@ -104,13 +108,16 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
           {months[month]} {year}
         </span>
 
-        <Button variant="secondary" onClick={() => {
-          const now = new Date();
-          setYear(now.getFullYear());
-          setMonth(now.getMonth());
-          setToday(now);
-          onMonthChange("current");
-        }}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            const now = new Date();
+            setYear(now.getFullYear());
+            setMonth(now.getMonth());
+            setToday(now);
+            onMonthChange("current");
+          }}
+        >
           Today
         </Button>
         <Button variant="secondary" onClick={() => onMonthChange("next")}>
@@ -127,9 +134,6 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
             />
           </svg>
         </Button>
-
-
-
       </div>
       <CalendarGrid entries={calendarEntries} today={today} />
     </>

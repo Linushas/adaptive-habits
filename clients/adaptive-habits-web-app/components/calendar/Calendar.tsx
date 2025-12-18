@@ -60,12 +60,13 @@ function CalendarCard({
       <Card
         className={`
                     relative w-24 h-24 transition-all duration-200 hover:shadow-xl hover:shadow-fg/10 cursor-pointer 
-                    ${dayNr == today.getDate() &&
-            date.getMonth() == today.getMonth() &&
-            date.getFullYear() == today.getFullYear()
-            ? "border-fg-muted"
-            : ""
-          }
+                    ${
+                      dayNr == today.getDate() &&
+                      date.getMonth() == today.getMonth() &&
+                      date.getFullYear() == today.getFullYear()
+                        ? "border-fg-muted"
+                        : ""
+                    }
                 `}
         style={
           {
