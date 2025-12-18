@@ -22,6 +22,7 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
         newToday.getMonth() !== today.getMonth() ||
         newToday.getFullYear() !== today.getFullYear()
       ) {
+        console.log("Today (calendar): " + newToday);
         setToday(newToday);
       }
     };
@@ -76,10 +77,10 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
     setMonth(newMonth);
 
     try {
-      // console.log(newYear, newMonth)
+      console.log("Selecting month: ", newYear, newMonth);
       const entries: CalendarHabitEntry[] = await getCalendar(
-        new Date(newYear, newMonth, 1),
-        new Date(newYear, newMonth + 1, 0)
+        new Date(newYear, newMonth, 1, 12, 0, 0),
+        new Date(newYear, newMonth + 1, 0, 12, 0, 0)
       );
       if (entries) setCalendarEntries(entries);
     } catch (e) {

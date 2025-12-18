@@ -2,6 +2,7 @@
 
 import { HabitCard } from "@/components/habits/HabitCard";
 import { HomeToolBar } from "@/components/habits/HomeToolBar";
+import { formatDateForApi } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
 import { useEffect, useState, useCallback } from "react";
@@ -15,33 +16,19 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState(entries);
 
-  useEffect(() => {
-    const checkDate = () => {
-      const now = new Date();
-      if (now.getDate() !== selectedDate.getDate()) {
-        if (selectedDate.toDateString() !== now.toDateString()) {
-          setSelectedDate(now);
-        }
-      }
-    };
-
-    const onFocus = () => checkDate();
-    window.addEventListener("focus", onFocus);
-    const interval = setInterval(checkDate, 60000);
-    return () => {
-      window.removeEventListener("focus", onFocus);
-      clearInterval(interval);
-    };
-  }, [selectedDate]);
-
   const onSelectedDate = (date: Date | undefined) => {
     if (!date || date.valueOf() > new Date().valueOf()) return;
-    setSelectedDate(date);
+
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(12, 0, 0, 0);
+
+    setSelectedDate(adjustedDate);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("-- " + formatDateForApi(selectedDate));
         const todays_entries: HabitEntry[] =
           await getTodaysEntries(selectedDate);
         if (todays_entries) setLocalEntries(todays_entries);

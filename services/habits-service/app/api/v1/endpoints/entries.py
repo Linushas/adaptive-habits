@@ -131,6 +131,8 @@ def get_todays_entries(
     if selected_date:
         today: date = selected_date
 
+    print("Selected date: ", today)
+
     todays_entries: List[HabitTodayEntry] = []
 
     habits: List[Habit] = session.exec(
@@ -181,6 +183,8 @@ def get_calendar_entries(
 
     if not start_date or not end_date:
         return []
+
+    print("Selected start: ", start_date, ", selected end: ", end_date)
 
     statement = select(HabitEntry).where(
         HabitEntry.user_id == current_user.id,

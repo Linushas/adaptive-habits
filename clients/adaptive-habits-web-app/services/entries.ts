@@ -9,11 +9,16 @@ export const getTodaysEntries = async (
 ): Promise<HabitEntry[]> => {
   if (!selectedDate) {
     selectedDate = new Date();
+    selectedDate.setHours(12, 0, 0, 0);
   }
 
+  const dateStr = formatDateForApi(selectedDate);
+  console.log("getTodaysEntries input date:", selectedDate);
+  console.log("getTodaysEntries formatted date:", dateStr);
+  console.log("Getting entries: " + dateStr);
   return apiClient<HabitEntry[]>("/entries/today", {
     params: {
-      selected_date: formatDateForApi(selectedDate),
+      selected_date: dateStr,
     },
     cache: "no-store",
   });
@@ -32,6 +37,7 @@ export const getCalendar = async (
   endDate?: Date
 ): Promise<CalendarHabitEntry[]> => {
   const now = new Date();
+  now.setHours(12, 0, 0, 0);
   const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
@@ -42,6 +48,7 @@ export const getCalendar = async (
     endStr = formatDateForApi(endDate);
   }
 
+  console.log("Getting calendar entries: FROM " + startStr + " TO " + endStr);
   return apiClient<CalendarHabitEntry[]>("/entries/calendar", {
     params: {
       start_date: startStr,
