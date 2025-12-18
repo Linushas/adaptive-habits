@@ -1,6 +1,6 @@
 import os
 from sqlmodel import SQLModel, create_engine, Session
-from config import settings
+from app.config import settings
 
 sqlite_file_name = settings.SQLITE_FILENAME
 sqlite_url = settings.DATABASE_URL

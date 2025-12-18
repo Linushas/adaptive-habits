@@ -9,8 +9,6 @@ from app.auth import (
     get_password_hash,
     get_current_user,
     validate_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS,
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from app.config import settings

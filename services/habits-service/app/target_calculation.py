@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import date
 from app.models import HabitEntry
 from dataclasses import dataclass
-from config import settings
+from app.config import settings
 
 
 @dataclass
