@@ -2,10 +2,9 @@
 
 import { CalendarHabitEntry } from "@/types/index";
 import CalendarGrid from "./Calendar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { getCalendar } from "@/services/entries";
-import { getToday } from "@/lib/utils";
 
 export interface CalendarProps {
   entries: CalendarHabitEntry[];
@@ -13,6 +12,20 @@ export interface CalendarProps {
 
 export default function CalendarDashboard({ entries }: CalendarProps) {
   const [calendarEntries, setCalendarEntries] = useState(entries);
+  const [today, setToday] = useState(new Date());
+
+  useEffect(() => {
+    const onFocus = () => {
+      const newToday = new Date();
+      if (newToday.getDate() !== today.getDate() || newToday.getMonth() !== today.getMonth() || newToday.getFullYear() !== today.getFullYear()) {
+        setToday(newToday);
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [today]);
+
   const months: string[] = [
     "January",
     "February",
@@ -27,8 +40,8 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
     "November",
     "December",
   ];
-  const [month, setMonth] = useState(getToday().getMonth());
-  const [year, setYear] = useState(getToday().getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
 
   async function onMonthChange(direction: string) {
     let newYear = year;
@@ -50,6 +63,9 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
       } else {
         newMonth += 1;
       }
+    } else if (direction.includes("current")) {
+      newYear = today.getFullYear();
+      newMonth = today.getMonth();
     }
 
     setYear(newYear);
@@ -87,6 +103,16 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
         <span className="font-bold text-2xl m-auto">
           {months[month]} {year}
         </span>
+
+        <Button variant="secondary" onClick={() => {
+          const now = new Date();
+          setYear(now.getFullYear());
+          setMonth(now.getMonth());
+          setToday(now);
+          onMonthChange("current");
+        }}>
+          Today
+        </Button>
         <Button variant="secondary" onClick={() => onMonthChange("next")}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -101,8 +127,11 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
             />
           </svg>
         </Button>
+
+
+
       </div>
-      <CalendarGrid entries={calendarEntries} />
+      <CalendarGrid entries={calendarEntries} today={today} />
     </>
   );
 }

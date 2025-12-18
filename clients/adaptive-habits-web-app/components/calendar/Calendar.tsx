@@ -1,4 +1,3 @@
-import { getToday } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { CalendarProps } from "./CalendarDashboard";
 import { CalendarHabitEntry } from "@/types/index";
@@ -7,8 +6,6 @@ import { CSSProperties } from "react";
 interface ProgressPieChartProps {
   percentage: number;
 }
-
-const today: Date = getToday();
 
 function ProgressPieChart({ percentage }: ProgressPieChartProps) {
   const radius = 10;
@@ -42,7 +39,15 @@ function ProgressPieChart({ percentage }: ProgressPieChartProps) {
   );
 }
 
-function CalendarCard({ log_date, completion_percentage }: CalendarHabitEntry) {
+interface CalendarCardProps extends CalendarHabitEntry {
+  today: Date;
+}
+
+function CalendarCard({
+  log_date,
+  completion_percentage,
+  today,
+}: CalendarCardProps) {
   const date: Date = new Date(log_date);
   const dayNr = date.getDate();
   const pie_percentage = Math.min(100, Math.max(0, completion_percentage));
@@ -55,13 +60,12 @@ function CalendarCard({ log_date, completion_percentage }: CalendarHabitEntry) {
       <Card
         className={`
                     relative w-24 h-24 transition-all duration-200 hover:shadow-xl hover:shadow-fg/10 cursor-pointer 
-                    ${
-                      dayNr == today.getDate() &&
-                      date.getMonth() == today.getMonth() &&
-                      date.getFullYear() == today.getFullYear()
-                        ? "border-fg-muted"
-                        : ""
-                    }
+                    ${dayNr == today.getDate() &&
+            date.getMonth() == today.getMonth() &&
+            date.getFullYear() == today.getFullYear()
+            ? "border-fg-muted"
+            : ""
+          }
                 `}
         style={
           {
@@ -102,7 +106,11 @@ function CalendarCard({ log_date, completion_percentage }: CalendarHabitEntry) {
   );
 }
 
-export default function CalendarGrid({ entries }: CalendarProps) {
+interface CalendarGridProps extends CalendarProps {
+  today: Date;
+}
+
+export default function CalendarGrid({ entries, today }: CalendarGridProps) {
   return (
     <div className="py-8 flex w-full max-w-4xl p-4 flex-wrap justify-center items-center flex-col">
       <div className="flex flex-wrap justify-evenly gap-4">
@@ -111,6 +119,7 @@ export default function CalendarGrid({ entries }: CalendarProps) {
             <CalendarCard
               log_date={entry.log_date}
               completion_percentage={entry.completion_percentage}
+              today={today}
             />
           </div>
         ))}

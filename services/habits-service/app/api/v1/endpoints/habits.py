@@ -6,8 +6,8 @@ from uuid import UUID
 from app.db import get_session
 from app.models import (
     Habit,
+    HabitBase,
     User,
-    HabitCreate,
     HabitUpdate,
     HabitDetails,
     HabitEntry,
@@ -54,10 +54,6 @@ def delete_habit(
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found")
 
-    # statement = (select(HabitEntry).where(HabitEntry.habit_id == id))
-    # entries: List[HabitEntry] = session.exec(statement).all()
-    # session.delete(entries)
-
     session.delete(habit)
     session.commit()
     return habit
@@ -65,7 +61,7 @@ def delete_habit(
 
 @router.post("/", response_model=Habit)
 def create_habit(
-    new_habit: HabitCreate,
+    new_habit: HabitBase,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):

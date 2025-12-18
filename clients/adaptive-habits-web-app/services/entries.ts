@@ -1,14 +1,14 @@
 "use server";
 
 import { CalendarHabitEntry, HabitEntry, HabitEntryUpdate } from "@/types";
-import { formatDateForApi, getToday } from "@/lib/utils";
+import { formatDateForApi } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
 
 export const getTodaysEntries = async (
   selectedDate?: Date
 ): Promise<HabitEntry[]> => {
   if (!selectedDate) {
-    selectedDate = getToday();
+    selectedDate = new Date();
   }
 
   return apiClient<HabitEntry[]>("/entries/today", {
@@ -31,7 +31,7 @@ export const getCalendar = async (
   startDate?: Date,
   endDate?: Date
 ): Promise<CalendarHabitEntry[]> => {
-  const now = getToday();
+  const now =  new Date();
   const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 

@@ -3,7 +3,7 @@ import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types";
 
 export default async function Home() {
-  const todays_entries: HabitEntry[] = await getTodaysEntries();
+  const todays_entries: HabitEntry[] = await getTodaysEntries(new Date());
 
   return (
     <HomeDashboard

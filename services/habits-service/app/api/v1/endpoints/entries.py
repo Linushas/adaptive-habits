@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict
 from datetime import date, timedelta, timezone, datetime
+from zoneinfo import ZoneInfo
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
@@ -17,11 +18,6 @@ from app.auth import get_current_user
 from app.target_calculation import calculate_next_target
 
 router = APIRouter()
-
-
-def get_today() -> date:
-    time_zone = timezone(timedelta(hours=1))
-    return datetime.now(time_zone).date()
 
 
 @router.get("/", response_model=List[HabitEntry])
@@ -42,7 +38,6 @@ def create_habit_entry(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    # entry = HabitEntryBase(**new_entry.model_dump(), user_id=current_user.id)
     entry = HabitEntry(**new_entry.model_dump(), user_id=current_user.id)
     session.add(entry)
     session.commit()
@@ -89,7 +84,7 @@ def update_habit_entry(
         .where(
             HabitEntry.user_id == current_user.id,
             HabitEntry.habit_id == habit_entry.habit_id,
-            HabitEntry.log_date <= get_today(),
+            HabitEntry.log_date <= date.today(),
             HabitEntry.log_date >= (habit_entry.log_date - timedelta(days=30)),
         )
         .order_by(HabitEntry.log_date)
@@ -103,7 +98,7 @@ def update_habit_entry(
         session.add(habit)
         session.commit()
 
-        tomorrow = get_today() + timedelta(1)
+        tomorrow = date.today() + timedelta(1)
         statement = select(HabitEntry).where(
             HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == tomorrow
         )
@@ -132,11 +127,9 @@ def get_todays_entries(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    today = get_today()
+    today = date.today()
     if selected_date:
         today: date = selected_date
-
-    # print(today)
 
     todays_entries: List[HabitTodayEntry] = []
 
@@ -173,6 +166,7 @@ def get_todays_entries(
         today_entry = HabitTodayEntry(**entry.model_dump(), habit=habit)
         todays_entries.append(today_entry)
 
+    # print(todays_entries)
     return todays_entries
 
 
@@ -206,6 +200,7 @@ def get_calendar_entries(
         calendar_entries.append(
             calendar_entry_from_entries(entries_date_lookup.get(d, []), d)
         )
+    # print(calendar_entries)
     return calendar_entries
 
 

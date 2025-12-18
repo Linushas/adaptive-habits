@@ -1,16 +1,15 @@
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from uuid import UUID
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlmodel import Session, select
-from app.db import get_session
 from app.models import User
 from app.config import settings
 
 SECRET_KEY = settings.SECRET_KEY
-ALGORITHM = "HS256"
+ALGORITHM = settings.HASH_ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = 90
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
@@ -26,21 +25,28 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict):
+def create_token(data: dict, type: str):  # not dict, use pydantic model?
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "type": "access"})
+    expire: datetime = None
+    if type == "access":
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    elif type == "refresh":
+        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    else:
+        return
+    to_encode.update({"exp": expire, "type": type})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def create_access_token(data: dict):
+    return create_token(data, "access")
 
 
 def create_refresh_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return create_token(data, "refresh")
 
 
-def validate_token(token: str, session: Session) -> User:
+def validate_token(token: str) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -49,22 +55,24 @@ def validate_token(token: str, session: Session) -> User:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        user_id: str = payload.get("id")
+        if username is None or user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
 
-    statement = select(User).where(User.username == username)
-    user = session.exec(statement).first()
-    if user is None:
-        raise credentials_exception
+    user = User(
+        id=UUID(user_id),
+        username=username,
+        hashed_password="" 
+    )
+
     return user
 
 
-def get_current_user(
+def get_current_user( # needs better error handling
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme),
-    session: Session = Depends(get_session),
 ):
     token_str = request.cookies.get("access_token") or token
     if not token_str:
@@ -74,4 +82,4 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return validate_token(token_str, session)
+    return validate_token(token_str)

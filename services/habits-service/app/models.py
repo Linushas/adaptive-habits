@@ -2,7 +2,8 @@ from typing import Optional, List
 from uuid import UUID, uuid4
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
-from datetime import datetime, date
+from datetime import datetime, date, timezone
+from app.config import settings
 
 
 ### USER ###
@@ -10,9 +11,7 @@ class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
-
-    # timezone: str = Field(default="UTC")
-    timezone: str = Field(default="CET")
+    
     is_admin: bool = Field(default=False)
 
 
@@ -28,15 +27,11 @@ class HabitBase(SQLModel):
 class Habit(HabitBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     entries: List["HabitEntry"] = Relationship(
         back_populates="habit", sa_relationship_kwargs={"cascade": "all, delete-orphan"}
     )
-
-
-class HabitCreate(HabitBase):
-    pass
 
 
 class HabitUpdate(SQLModel):
@@ -54,6 +49,7 @@ class HabitEntryBase(SQLModel):
     value: int
     target_snapshot: int
     notes: Optional[str] = None
+    latest_ema: Optional[int] = None
 
 
 class HabitEntryUpdate(SQLModel):
@@ -67,7 +63,7 @@ class HabitEntryUpdate(SQLModel):
 class HabitEntry(HabitEntryBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     habit: Habit = Relationship(back_populates="entries")
 
@@ -78,14 +74,14 @@ class HabitTodayEntryBase(SQLModel):
     value: int
     target_snapshot: int
     notes: Optional[str] = None
-    completed_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class HabitTodayEntry(HabitEntryBase, table=False):
     habit: Habit
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="user.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class CalendarHabitEntry(BaseModel):

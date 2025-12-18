@@ -40,13 +40,18 @@ def login(
     session: Session = Depends(get_session),
 ):
     statement = select(User).where(User.username == form_data.username)
-    user = session.exec(statement).first()
+    user: User = session.exec(statement).first()
 
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    access_token = create_access_token(data={"sub": user.username})
-    refresh_token = create_refresh_token(data={"sub": user.username})
+
+    token_payload = {
+        "sub": user.username,
+        "id": str(user.id),
+    }
+    access_token = create_access_token(data=token_payload)
+    refresh_token = create_refresh_token(data=token_payload)
 
     response.set_cookie(
         key="access_token",
@@ -70,19 +75,24 @@ def login(
 
 @router.post("/refresh")
 def refresh(
-    request: Request, response: Response, session: Session = Depends(get_session)
+    request: Request, response: Response
 ):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token missing")
 
     try:
-        user = validate_token(refresh_token, session)
-        new_access_token = create_access_token(data={"sub": user.username})
+        user: User = validate_token(refresh_token)
+        
+        token_payload = {
+            "sub": user.username,
+            "id": str(user.id)
+        }
+        access_token = create_access_token(data=token_payload)
 
         response.set_cookie(
             key="access_token",
-            value=new_access_token,
+            value=access_token,
             httponly=True,
             secure=(settings.ENV_MODE == "production"),
             samesite="lax",
@@ -99,5 +109,4 @@ def get_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
         "username": current_user.username,
-        "timezone": current_user.timezone,
     }

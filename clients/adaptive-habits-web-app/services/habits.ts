@@ -1,7 +1,7 @@
 "use server";
 
 import { apiClient } from "@/lib/api";
-import { formatDateForApi, getToday } from "@/lib/utils";
+import { formatDateForApi } from "@/lib/utils";
 import { Habit, HabitDetails, HabitModel } from "@/types";
 
 export const getHabits = async (): Promise<Habit[]> => {
@@ -27,7 +27,7 @@ export const deleteHabit = async (habitId: string) => {
 export const getHabitDetails = async (
   habitId: string
 ): Promise<HabitDetails> => {
-  const now = getToday();
+  const now = new Date();
   const tomorrow = new Date(now);
   tomorrow.setDate(now.getDate() + 1);
   const start = new Date(tomorrow);

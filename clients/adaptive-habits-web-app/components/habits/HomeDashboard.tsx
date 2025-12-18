@@ -2,7 +2,6 @@
 
 import { HabitCard } from "@/components/habits/HabitCard";
 import { HomeToolBar } from "@/components/habits/HomeToolBar";
-import { getToday } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
 import { useEffect, useState, useCallback } from "react";
@@ -12,12 +11,31 @@ interface HomeDashboardProps {
 }
 
 export default function HomeDashboard({ entries }: HomeDashboardProps) {
-  const [selectedDate, setSelectedDate] = useState(getToday());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState(entries);
 
+  useEffect(() => {
+    const checkDate = () => {
+      const now = new Date();
+      if (now.getDate() !== selectedDate.getDate()) {
+        if (selectedDate.toDateString() !== now.toDateString()) {
+          setSelectedDate(now);
+        }
+      }
+    };
+
+    const onFocus = () => checkDate();
+    window.addEventListener("focus", onFocus);
+    const interval = setInterval(checkDate, 60000);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      clearInterval(interval);
+    };
+  }, [selectedDate]);
+
   const onSelectedDate = (date: Date | undefined) => {
-    if (!date || date.valueOf() > getToday().valueOf()) return;
+    if (!date || date.valueOf() > new Date().valueOf()) return;
     setSelectedDate(date);
   };
 
@@ -53,7 +71,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
             <div className="flex flex-wrap justify-evenly gap-4">
               {localEntries.map((entry, index) =>
                 hideCompleted &&
-                entry.value == entry.habit.current_target_value ? (
+                  entry.value == entry.habit.current_target_value ? (
                   <div key={index}></div>
                 ) : (
                   <div key={index} className="contents">
