@@ -10,8 +10,6 @@ from app.config import settings
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.HASH_ALGORITHM
-ACCESS_TOKEN_EXPIRE_MINUTES = 90
-REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
@@ -29,9 +27,9 @@ def create_token(data: dict, type: str):  # not dict, use pydantic model?
     to_encode = data.copy()
     expire: datetime = None
     if type == "access":
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     elif type == "refresh":
-        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     else:
         return
     to_encode.update({"exp": expire, "type": type})

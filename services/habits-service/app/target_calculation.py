@@ -2,6 +2,7 @@ from typing import List, Optional
 from datetime import date
 from app.models import HabitEntry
 from dataclasses import dataclass
+from config import settings
 
 
 @dataclass
@@ -25,22 +26,11 @@ class Ema:
         return new_value
 
 
-# def exponential_moving_average(series: List[DataPoint], alpha: float) -> List[DataPoint]:
-#     output: List[DataPoint] = []
-#     ema = Ema(alpha=alpha)
-
-#     for datum in series:
-#         current: float = ema.average(datum.value)
-#         output.append(DataPoint(datum.log_date, current))
-
-#     return output
-
-
 def calculate_next_target(
     history: List[HabitEntry],
-    alpha: float = 0.2,
-    upper_threshold_factor: float = 1.0,
-    lower_threshold_factor: float = 0.95,
+    alpha: float = settings.DEFAULT_EMA_ALPHA,
+    upper_threshold_factor: float = settings.DEFAULT_TARGET_INCREASE_THRESHOLD,
+    lower_threshold_factor: float = settings.DEFAULT_TARGET_DECREASE_THRESHOLD,
 ) -> int:
     if not history:
         return 0

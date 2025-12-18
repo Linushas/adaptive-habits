@@ -17,9 +17,8 @@ from app.config import settings
 
 router = APIRouter()
 
-ACCESS_TOKEN_AGE = ACCESS_TOKEN_EXPIRE_MINUTES * 60
-REFRESH_TOKEN_AGE = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
-
+ACCESS_TOKEN_AGE = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+REFRESH_TOKEN_AGE = settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
 
 @router.post("/register")
 def register(username: str, password: str, session: Session = Depends(get_session)):

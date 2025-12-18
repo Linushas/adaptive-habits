@@ -1,8 +1,9 @@
 import os
 from sqlmodel import SQLModel, create_engine, Session
+from config import settings
 
-sqlite_file_name = "adaptive_habits.db"
-sqlite_url = os.getenv("DATABASE_URL", "sqlite:///adaptive_habits.db")
+sqlite_file_name = settings.SQLITE_FILENAME
+sqlite_url = settings.DATABASE_URL
 
 engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
 
