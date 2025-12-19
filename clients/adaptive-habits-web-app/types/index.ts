@@ -1,11 +1,4 @@
 // ---- HABITS ----
-export interface HabitResponse {
-  name: string;
-  description?: string;
-  current_target_value: number;
-  frequency: string;
-  unit?: string;
-}
 
 export interface HabitModel {
   name: string;

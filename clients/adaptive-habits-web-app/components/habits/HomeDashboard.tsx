@@ -5,6 +5,7 @@ import { HomeToolBar } from "@/components/habits/HomeToolBar";
 import { formatDateForApi } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 
 interface HomeDashboardProps {
@@ -15,6 +16,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState(entries);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSelectedDate = (date: Date | undefined) => {
     if (!date || date.valueOf() > new Date().valueOf()) return;
@@ -28,12 +30,15 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("-- " + formatDateForApi(selectedDate));
+        // console.log("-- " + formatDateForApi(selectedDate));
+        setIsLoading(true);
         const todays_entries: HabitEntry[] =
           await getTodaysEntries(selectedDate);
         if (todays_entries) setLocalEntries(todays_entries);
       } catch (e) {
         console.error(e);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -50,7 +55,11 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
           className="min-w-full"
         />
       </div>
-      {localEntries.length == 0 ? (
+      {isLoading ? (
+        <span className="text-fg-muted p-8">
+          <Loader2 className="mr-2 h-8 w-8 animate-spin" />
+        </span>
+      ) : localEntries.length == 0 ? (
         <p className="text-fg-muted">No habits</p>
       ) : (
         <>
