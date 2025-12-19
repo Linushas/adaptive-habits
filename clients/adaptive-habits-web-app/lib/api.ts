@@ -5,16 +5,19 @@ import { redirect } from "next/navigation";
 
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
+const ACCESS_TOKEN_NAME = "__session";
+const REFRESH_TOKEN_NAME = "_r";
+
 type Options = RequestInit & {
   params?: Record<string, string | number | boolean | null | undefined>;
 };
 
 async function getHeaders() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   return {
     "Content-Type": "application/json",
-    Cookie: `access_token=${token}`,
+    Cookie: `${ACCESS_TOKEN_NAME}=${token}`,
   };
 }
 

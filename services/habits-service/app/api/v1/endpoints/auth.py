@@ -3,12 +3,13 @@ from sqlmodel import select, Session
 from app.models import User
 from app.db import get_session
 from app.auth import (
-    create_access_token,
-    create_refresh_token,
+    create_token,
     verify_password,
     get_password_hash,
     get_current_user,
     validate_token,
+    TokenPayload,
+    TokenType,
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from app.config import settings
@@ -43,15 +44,17 @@ def login(
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    token_payload = {
-        "sub": user.username,
-        "id": str(user.id),
-    }
-    access_token = create_access_token(data=token_payload)
-    refresh_token = create_refresh_token(data=token_payload)
+    token_payload = TokenPayload(
+        sub=user.username,
+        user_id=str(user.id),
+        type=TokenType.ACCESS
+    )
+    access_token = create_token(payload=token_payload)
+    refresh_payload = token_payload.model_copy(update={"type": TokenType.REFRESH})
+    refresh_token = create_token(payload=refresh_payload)
 
     response.set_cookie(
-        key="access_token",
+        key=settings.ACCESS_TOKEN_NAME,
         value=access_token,
         httponly=True,
         secure=(settings.ENV_MODE == "production"),
@@ -59,7 +62,7 @@ def login(
         max_age=ACCESS_TOKEN_AGE,
     )
     response.set_cookie(
-        key="refresh_token",
+        key=settings.REFRESH_TOKEN_NAME,
         value=refresh_token,
         httponly=True,
         secure=(settings.ENV_MODE == "production"),
@@ -72,18 +75,22 @@ def login(
 
 @router.post("/refresh")
 def refresh(request: Request, response: Response):
-    refresh_token = request.cookies.get("refresh_token")
+    refresh_token = request.cookies.get(settings.REFRESH_TOKEN_NAME)
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token missing")
 
     try:
-        user: User = validate_token(refresh_token)
+        user: User = validate_token(refresh_token, expected_type=TokenType.REFRESH)
 
-        token_payload = {"sub": user.username, "id": str(user.id)}
-        access_token = create_access_token(data=token_payload)
+        token_payload = TokenPayload(
+            sub=user.username,
+            user_id=str(user.id),
+            type=TokenType.ACCESS
+        )
+        access_token = create_token(payload=token_payload)
 
         response.set_cookie(
-            key="access_token",
+            key=settings.ACCESS_TOKEN_NAME,
             value=access_token,
             httponly=True,
             secure=(settings.ENV_MODE == "production"),

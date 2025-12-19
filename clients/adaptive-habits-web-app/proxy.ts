@@ -3,9 +3,12 @@ import type { NextRequest } from "next/server";
 
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
 
+const ACCESS_TOKEN_NAME = "__session";
+const REFRESH_TOKEN_NAME = "_r";
+
 export async function proxy(request: NextRequest) {
-  const accessToken = request.cookies.get("access_token")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
+  const accessToken = request.cookies.get(ACCESS_TOKEN_NAME)?.value;
+  const refreshToken = request.cookies.get(REFRESH_TOKEN_NAME)?.value;
   const publicPaths = ["/login", "/register"];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
   const forceRefresh = request.nextUrl.searchParams.get("refresh") === "true";
@@ -37,7 +40,7 @@ async function refresh(
     const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
       headers: {
-        Cookie: `refresh_token=${refreshToken}`,
+        Cookie: `${REFRESH_TOKEN_NAME}=${refreshToken}`,
       },
     });
 

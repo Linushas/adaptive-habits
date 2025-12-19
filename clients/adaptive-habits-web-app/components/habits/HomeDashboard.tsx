@@ -58,7 +58,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
             <div className="flex flex-wrap justify-evenly gap-4">
               {localEntries.map((entry, index) =>
                 hideCompleted &&
-                entry.value == entry.habit.current_target_value ? (
+                entry.value >= entry.target_snapshot ? (
                   <div key={index}></div>
                 ) : (
                   <div key={index} className="contents">
