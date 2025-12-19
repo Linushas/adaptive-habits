@@ -9,10 +9,12 @@ interface HabitControlsProps {
 
 export function HabitControls({ habit, todaysEntry }: HabitControlsProps) {
   return (
-    <div className="flex pb-0 m-0">
-      <DialogTitle className="text-3xl">{habit.name}</DialogTitle>
+    <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-2">
+      <DialogTitle className="text-3xl text-center md:text-left">
+        {habit.name}
+      </DialogTitle>
 
-      <div className="flex m-auto space-x-16">
+      <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-12">
         <div className="space-y-3 text-center">
           <h5 className="font-bold text-fg">Current Target</h5>
           <span className="text-fg-muted">{todaysEntry.target_snapshot}</span>

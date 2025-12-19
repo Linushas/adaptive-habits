@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Slider } from "../ui/slider";
 import { Card, CardContent, CardTitle } from "../ui/card";
-import { motion, useSpring, useTransform } from "framer-motion";
 import { HabitEntry, HabitEntryUpdate } from "@/types";
 import { updateHabitEntry } from "@/services/entries";
 import { HabitDetailsModal } from "../habit_details_modal/HabitDetailsModal";
@@ -35,23 +34,13 @@ export function HabitCard({
     setLocalValue(value);
   }, [value]);
 
-  const springValue = useSpring(localValue, {
-    stiffness: 500,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
-  useEffect(() => {
-    springValue.set(localValue);
-  }, [localValue, springValue]);
-
-  const displayValue = useTransform(springValue, (latest) =>
-    Math.round(latest)
-  );
-
   const handleSliderChange = (vals: number[]) => {
     const newValue = vals[0];
     setLocalValue(newValue);
+  };
+
+  const handleSliderCommit = (vals: number[]) => {
+    const newValue = vals[0];
     if (onValueChange) onValueChange(newValue);
   };
 
@@ -122,12 +111,12 @@ export function HabitCard({
                   }}
                 />
               ) : (
-                <motion.span
+                <span
                   className="m-auto hover:text-fg-muted/40 cursor-text"
                   onClick={() => setIsInputOpen(true)}
                 >
-                  {displayValue}
-                </motion.span>
+                  {localValue}
+                </span>
               )}
               <span className="m-auto">
                 / {targetValue} {unit != null ? unit : ""}
@@ -175,6 +164,7 @@ export function HabitCard({
             max={targetValue}
             step={1}
             onValueChange={handleSliderChange}
+            onValueCommit={handleSliderCommit}
             className="min-w-full"
           />
         )}

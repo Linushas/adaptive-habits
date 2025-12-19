@@ -80,7 +80,7 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
           </Button>
         </div>
       </DialogTrigger>
-      <DialogContent className="min-w-[80%] max-w-[80%] h-[80%] align-top">
+      <DialogContent className="min-w-[100%] max-w-[100%] h-[100%] md:min-w-[80%] md:max-w-[80%] md:h-[80%] align-top">
         {habitDetails ? (
           <HabitControls habit={habitDetails.habit} todaysEntry={entry} />
         ) : (
@@ -103,6 +103,7 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
         ) : (
           <div className="max-h-90 h-full bg-bg-light-2 rounded-lg max-w-full w-full overflow-hidden transition-none"></div>
         )}
+
         <DialogFooter>
           <Button
             variant={"ghost"}
