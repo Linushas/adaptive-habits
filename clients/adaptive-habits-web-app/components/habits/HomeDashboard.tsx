@@ -41,7 +41,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
 
   return (
     <div className="bg-bg min-h-full w-full items-center justify-center flex flex-col">
-      <div className="flex min-w-4xl px-10 p-4 flex-wrap justify-start gap-4">
+      <div className="flex w-full max-w-4xl px-4 md:px-10 p-4 flex-wrap justify-start gap-4">
         <HomeToolBar
           hideCompleted={hideCompleted}
           onHideCompleted={() => setHideCompleted(!hideCompleted)}
@@ -54,7 +54,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
         <p className="text-fg-muted">No habits</p>
       ) : (
         <>
-          <div className="py-8 flex w-full max-w-4xl p-4 flex-wrap justify-center items-center flex-col">
+          <div className="py-8 flex w-full max-w-4xl px-4 md:px-10 p-4 flex-wrap justify-center items-center flex-col">
             <div className="flex flex-wrap justify-evenly gap-4">
               {localEntries.map((entry, index) =>
                 hideCompleted && entry.value >= entry.target_snapshot ? (

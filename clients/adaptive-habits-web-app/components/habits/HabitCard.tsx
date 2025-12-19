@@ -77,7 +77,7 @@ export function HabitCard({
   return (
     <Card
       className={`
-                ${className} w-fit min-w-sm p-4 flex-1 hover:bg-bg-light-2/60 cursor-pointer
+                ${className} w-full md:w-fit md:min-w-sm p-4 flex-1 hover:bg-bg-light-2/60 cursor-pointer
                 ${
                   localValue >= targetValue
                     ? "shadow-2xl shadow-fg/10"

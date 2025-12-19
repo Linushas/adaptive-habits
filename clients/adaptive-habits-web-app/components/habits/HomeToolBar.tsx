@@ -29,7 +29,9 @@ export function HomeToolBar({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={`${className} pt-32 flex justify-between`}>
+    <div
+      className={`${className} pt-8 md:pt-32 flex flex-col md:flex-row md:justify-between items-center gap-4`}
+    >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -70,11 +72,11 @@ export function HomeToolBar({
           : ""}
       </h2>
 
-      <div>
+      <div className="flex flex-wrap justify-center gap-2">
         <Button
           variant={hideCompleted ? "outline" : "ghost"}
           onClick={onHideCompleted}
-          className="m-2"
+          className="m-0"
         >
           {hideCompleted ? "Show Completed" : "Hide Completed"}
         </Button>

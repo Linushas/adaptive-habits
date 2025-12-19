@@ -90,24 +90,40 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
 
   return (
     <>
-      <div className="flex min-w-4xl px-10 p-4 flex-wrap justify-start gap-4">
-        <Button variant="secondary" onClick={() => onMonthChange("previous")}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-6"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.28 7.72a.75.75 0 0 1 0 1.06l-2.47 2.47H21a.75.75 0 0 1 0 1.5H4.81l2.47 2.47a.75.75 0 1 1-1.06 1.06l-3.75-3.75a.75.75 0 0 1 0-1.06l3.75-3.75a.75.75 0 0 1 1.06 0Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </Button>
-        <span className="font-bold text-2xl m-auto">
-          {months[month]} {year}
-        </span>
+      <div className="flex w-full max-w-4xl px-4 md:px-10 p-4 flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="secondary" onClick={() => onMonthChange("previous")}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M7.28 7.72a.75.75 0 0 1 0 1.06l-2.47 2.47H21a.75.75 0 0 1 0 1.5H4.81l2.47 2.47a.75.75 0 1 1-1.06 1.06l-3.75-3.75a.75.75 0 0 1 0-1.06l3.75-3.75a.75.75 0 0 1 1.06 0Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Button>
+          <span className="font-bold text-2xl min-w-[200px] text-center">
+            {months[month]} {year}
+          </span>
+          <Button variant="secondary" onClick={() => onMonthChange("next")}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.72 7.72a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1 0 1.06l-3.75 3.75a.75.75 0 1 1-1.06-1.06l2.47-2.47H3a.75.75 0 0 1 0-1.5h16.19l-2.47-2.47a.75.75 0 0 1 0-1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Button>
+        </div>
 
         <Button
           variant="secondary"
@@ -120,20 +136,6 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
           }}
         >
           Today
-        </Button>
-        <Button variant="secondary" onClick={() => onMonthChange("next")}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-6"
-          >
-            <path
-              fillRule="evenodd"
-              d="M16.72 7.72a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1 0 1.06l-3.75 3.75a.75.75 0 1 1-1.06-1.06l2.47-2.47H3a.75.75 0 0 1 0-1.5h16.19l-2.47-2.47a.75.75 0 0 1 0-1.06Z"
-              clipRule="evenodd"
-            />
-          </svg>
         </Button>
       </div>
       <CalendarGrid entries={calendarEntries} today={today} />

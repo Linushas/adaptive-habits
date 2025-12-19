@@ -17,7 +17,7 @@ export function LoginForm() {
 
   return (
     <>
-      <form action={formAction} className="space-y-6">
+      <form action={formAction} className="space-y-6 w-full">
         {errorMessage && (
           <div className="bg-red-300 text-bg-dark text-sm p-3 rounded-md text-center">
             {errorMessage}
