@@ -5,6 +5,7 @@ from app.models import (
     CalendarHabitEntry,
 )
 
+
 def calendar_entry_from_entries(
     entries: List[HabitEntry], d: date
 ) -> CalendarHabitEntry:

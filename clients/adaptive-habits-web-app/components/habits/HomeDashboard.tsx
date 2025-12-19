@@ -57,8 +57,7 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
           <div className="py-8 flex w-full max-w-4xl p-4 flex-wrap justify-center items-center flex-col">
             <div className="flex flex-wrap justify-evenly gap-4">
               {localEntries.map((entry, index) =>
-                hideCompleted &&
-                entry.value >= entry.target_snapshot ? (
+                hideCompleted && entry.value >= entry.target_snapshot ? (
                   <div key={index}></div>
                 ) : (
                   <div key={index} className="contents">

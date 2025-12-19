@@ -45,9 +45,7 @@ def login(
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     token_payload = TokenPayload(
-        sub=user.username,
-        user_id=str(user.id),
-        type=TokenType.ACCESS
+        sub=user.username, user_id=str(user.id), type=TokenType.ACCESS
     )
     access_token = create_token(payload=token_payload)
     refresh_payload = token_payload.model_copy(update={"type": TokenType.REFRESH})
@@ -83,9 +81,7 @@ def refresh(request: Request, response: Response):
         user: User = validate_token(refresh_token, expected_type=TokenType.REFRESH)
 
         token_payload = TokenPayload(
-            sub=user.username,
-            user_id=str(user.id),
-            type=TokenType.ACCESS
+            sub=user.username, user_id=str(user.id), type=TokenType.ACCESS
         )
         access_token = create_token(payload=token_payload)
 

@@ -4,6 +4,7 @@ from app.models import (
     Habit,
 )
 
+
 def get_habit(session: Session, user_id: str, habit_id: str) -> Habit:
     statement = (
         select(Habit).where(Habit.user_id == user_id).where(Habit.id == habit_id)

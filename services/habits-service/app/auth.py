@@ -19,11 +19,13 @@ class TokenType(Enum):
     ACCESS = "access"
     REFRESH = "refresh"
 
+
 class TokenPayload(BaseModel):
     sub: str
     user_id: str
     exp: Optional[datetime] = None
     type: TokenType
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
@@ -50,11 +52,9 @@ def create_token(payload: TokenPayload) -> str:
         )
     else:
         raise ValueError("Invalid Token Type")
-    to_encode.update({
-        "exp": expire, 
-        "type": payload.type.value 
-    })
+    to_encode.update({"exp": expire, "type": payload.type.value})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def validate_token(token: str, expected_type: TokenType = None) -> User:
     credentials_exception = HTTPException(
@@ -67,20 +67,18 @@ def validate_token(token: str, expected_type: TokenType = None) -> User:
         token_payload = TokenPayload(**payload_dict)
     except (JWTError, ValueError):
         raise credentials_exception
-    
+
     if expected_type and token_payload.type != expected_type:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail=f"Invalid token type. Expected {expected_type.value}"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token type. Expected {expected_type.value}",
         )
-    
+
     if token_payload.sub is None or token_payload.user_id is None:
         raise credentials_exception
 
     user = User(
-        id=UUID(token_payload.user_id), 
-        username=token_payload.sub, 
-        hashed_password=""
+        id=UUID(token_payload.user_id), username=token_payload.sub, hashed_password=""
     )
 
     return user
