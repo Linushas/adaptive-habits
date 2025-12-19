@@ -2,10 +2,15 @@ import os
 from sqlmodel import SQLModel, create_engine, Session
 from app.config import settings
 
-sqlite_file_name = settings.SQLITE_FILENAME
-sqlite_url = settings.DATABASE_URL
+database_url = settings.DATABASE_URL
 
-engine = create_engine(sqlite_url, connect_args={"check_same_thread": False})
+
+connect_args = {}
+if database_url.startswith("sqlite"):
+    connect_args["check_same_thread"] = False
+
+
+engine = create_engine(database_url, connect_args=connect_args)
 
 
 def create_db_and_tables():

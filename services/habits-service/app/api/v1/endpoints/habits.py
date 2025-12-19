@@ -13,6 +13,7 @@ from app.models import (
     HabitEntry,
 )
 from app.auth import get_current_user
+from app.core.habits import get_habit
 
 router = APIRouter()
 
@@ -32,13 +33,7 @@ def read_habit(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    statement = (
-        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
-    )
-    habit = session.exec(statement).first()
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
-    return habit
+    return get_habit(session, current_user.id, id)
 
 
 @router.delete("/{id}", response_model=Habit)
@@ -47,13 +42,7 @@ def delete_habit(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    statement = (
-        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
-    )
-    habit = session.exec(statement).first()
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
-
+    habit = get_habit(session, current_user.id, id)
     session.delete(habit)
     session.commit()
     return habit
@@ -79,12 +68,7 @@ def update_habit(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    statement = (
-        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
-    )
-    habit = session.exec(statement).first()
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
+    habit = get_habit(session, current_user.id, id)
 
     habit_data = habit_update.model_dump(exclude_unset=True)
     for key, value in habit_data.items():
@@ -104,12 +88,7 @@ def get_habit_details(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
-    statement = (
-        select(Habit).where(Habit.user_id == current_user.id).where(Habit.id == id)
-    )
-    habit = session.exec(statement).first()
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
+    habit = get_habit(session, current_user.id, id)
 
     if not start_date or not end_date:
         return []

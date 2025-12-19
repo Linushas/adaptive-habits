@@ -8,3 +8,4 @@ uvicorn
 dotenv
 pydantic
 black
+psycopg2-binary

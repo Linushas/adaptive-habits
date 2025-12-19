@@ -1,6 +1,18 @@
-version: '3.8'
 
 services:
+
+  db:
+    image: postgres:17
+    profiles: ["postgres"] 
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+
   api:
     container_name: habits-service
     build:
@@ -8,10 +20,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    depends_on:
+      db:
+        condition: service_started
+        required: false
     volumes:
-      - habit_data:/data
+      - sqlite_data:/data
     environment:
-      - DATABASE_URL=sqlite:////data/adaptive_habits.db 
+      - DATABASE_URL=${DATABASE_URL}
       - ALLOWED_ORIGINS=http://localhost:3000
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -30,5 +46,6 @@ services:
     restart: always
 
 volumes:
-  habit_data:
+  sqlite_data:
+  postgres_data:
   

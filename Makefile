@@ -1,7 +1,10 @@
 include services/habits-service/.env
 export
 
-.PHONY: up down db-reset dev format
+.PHONY: up down db-reset dev format setup
+
+setup:
+	./scripts/setup.sh
 
 up:
 	@echo "Starting app..."

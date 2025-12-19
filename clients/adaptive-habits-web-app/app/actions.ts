@@ -7,6 +7,9 @@ import { HabitModel } from "@/types";
 import { redirect } from "next/navigation";
 import { login, register } from "@/services/auth";
 
+const ACCESS_TOKEN_NAME = "__session";
+const REFRESH_TOKEN_NAME = "_r";
+
 type ActionState = {
   error?: string;
 } | null;
@@ -61,8 +64,8 @@ export async function registerAction(
 
 export async function logoutAction() {
   const cookieStore = await cookies();
-  cookieStore.delete("access_token");
-  cookieStore.delete("refresh_token");
+  cookieStore.delete(ACCESS_TOKEN_NAME);
+  cookieStore.delete(REFRESH_TOKEN_NAME);
   redirect("/login");
 }
 

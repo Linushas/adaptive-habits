@@ -15,7 +15,9 @@ from app.models import (
     CalendarHabitEntry,
 )
 from app.auth import get_current_user
-from app.target_calculation import calculate_next_target
+from app.util.target_calculation import calculate_next_target
+from app.core.habits import get_habit
+from app.core.entries import calendar_entry_from_entries
 
 router = APIRouter()
 
@@ -70,14 +72,7 @@ def update_habit_entry(
     session.refresh(habit_entry)
 
     ### Target adaption
-    statement = (
-        select(Habit)
-        .where(Habit.user_id == current_user.id)
-        .where(Habit.id == habit_entry.habit_id)
-    )
-    habit: Habit = session.exec(statement).first()
-    if not habit:
-        raise HTTPException(status_code=404, detail="Habit not found")
+    habit = get_habit(session, current_user.id, habit_entry.habit_id)
 
     statement = (
         select(HabitEntry)
@@ -206,24 +201,3 @@ def get_calendar_entries(
         )
     # print(calendar_entries)
     return calendar_entries
-
-
-def calendar_entry_from_entries(
-    entries: List[HabitEntry], d: date
-) -> CalendarHabitEntry:
-    if entries:
-        total_percentage = 0
-        for entry in entries:
-            if entry.target_snapshot > 0:
-                total_percentage += (entry.value * 100) / entry.target_snapshot
-        avg: int = int(total_percentage / len(entries))
-
-        calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
-            log_date=d, completion_percentage=avg
-        )
-        return calendar_entry
-    else:
-        calendar_entry: CalendarHabitEntry = CalendarHabitEntry(
-            log_date=d, completion_percentage=0
-        )
-        return calendar_entry

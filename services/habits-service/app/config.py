@@ -8,7 +8,6 @@ class Settings:
     ENV_MODE: str = os.getenv("ENV_MODE", "dev")
 
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///adaptive_habits.db")
-    SQLITE_FILENAME: str = os.getenv("SQLITE_FILENAME", "adaptive_habits.db")
 
     SECRET_KEY: str = os.getenv("SECRET_KEY", None)
     HASH_ALGORITHM: str = "HS256"
