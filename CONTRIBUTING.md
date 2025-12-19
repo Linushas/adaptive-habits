@@ -44,12 +44,12 @@ A `Makefile` is used for development.
     make clean
     ```
 
-Please read the **[Setup Guide](docs/SETUP_GUIDE.md)**.
+Please read the **![README](./README.md)**.
 
 ## Development Workflow
 
 ### Database
-The project uses a local SQLite database by default (see `services/habits-service/app/db.py`).
+The project uses a local SQLite database by default (see `services/habits-service/app/db.py`), and support local and external PostgresSQL databases. See ![README](./README.md) how to setup the project.
 
 **To reset the database (wipe all data):**
 ```bash
@@ -72,24 +72,25 @@ make db-reset
 ```bash
 make format
 ```
-4. **Commit Messages:** Write clear, descriptive commit messages. Use the prefixes `feat:` or `fix:`.
+4. **Commit Messages:** Write clear, descriptive commit messages.
 5. **Pull Request:**
     - Open a PR against the `main` branch.
     - Provide a description of changes.
     - Link any related issues.
 
 ## Coding Standards
-- **Generative AI / Vibe Coding**: AI-assisted development (Cursor, Copilot, LLMs) is embraced. Note: You are fully responsible for the code you commit. Ensure you understand the logic, security, and that it fits the project structure.
+- **Generative AI / Vibe Coding**: AI-assisted development (Cursor, Copilot, LLMs) is embraced. Note: You are fully responsible for the code you commit. Ensure you understand the logic, security, and that it fits the project structure. Make sure to carefully review generated code and not blindly copy & paste, to mitigate hallucination, security, and laundering risks.
 
 ### Formatting & Style
 Automated formatters are used to maintain consistency. Please run ```make format``` before pushing. 
+Formatters: 
 - Frontend: Prettier
 - Backend: Black 
 
 (Python: Follow PEP 8 guidelines.)
 
-## Documentation
+<!-- ## Documentation
 If you change an API endpoint or add a major feature, please update the relevant documentation:
-- **API Changes:** Update `docs/API_SPECS.md`.
+- **API Changes:** Update `docs/API_SPECS.md`. -->
 
 Thank you for contributing!
