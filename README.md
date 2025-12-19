@@ -3,7 +3,7 @@ Most habit trackers are static. This project explores Dynamic Difficulty Adjustm
 
 This habit tracker adapts to the user's progress. Using algorithms that decrease/increase the target values for each habit depending on activity. Implementing Dynamic Difficulty Adjustment to keep the user engaged and increase retention. The goal is to give the user just enough of a challenge to improve, but as low friction as possible to continue. 
 
-**Visit the live demo:** adaptive-habits.vercel.app
+**Visit the live demo:** [Setup Guide](adaptive-habits.vercel.app)
 - Register and try for free. Note: project is in development and may produce severe bugs.
 - If you want to *self host* the app, see instructions below.
 
