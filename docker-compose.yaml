@@ -34,6 +34,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - ALLOWED_ORIGINS=http://localhost:3000
+      - ENV_MODE=production
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
@@ -48,6 +49,7 @@ services:
       - "3000:3000"
     environment:
       - INTERNAL_API_URL=http://habits-service:8000/api/v1
+      - NODE_ENV=production
     restart: always
 
 volumes:
