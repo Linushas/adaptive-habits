@@ -64,13 +64,13 @@ export function HomeToolBar({
         </PopoverContent>
       </Popover>
 
-      <h2 className="text-2xl font-bold m-auto">
+      {/* <h2 className="text-2xl font-bold m-auto">
         {selectedDate
           ? selectedDate.getDate() == new Date().getDate()
             ? "Today"
             : selectedDate.toDateString()
           : ""}
-      </h2>
+      </h2> */}
 
       <div className="flex flex-wrap justify-center gap-2">
         <Button
