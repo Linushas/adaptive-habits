@@ -21,9 +21,9 @@ export function Navbar() {
         <div className="flex items-center bg-transparent justify-between h-16">
           <a href={"/"}>
             <Image
-              src="/adaptive_habits_logo.png"
+              src="/icon.png"
               alt="Adaptive Habits Logo"
-              width={32}
+              width={24}
               height={8}
             />
           </a>

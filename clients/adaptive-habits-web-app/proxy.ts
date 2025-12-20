@@ -83,5 +83,5 @@ async function refresh(
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|manifest.webmanifest|favicon.ico|.*\\.png$).*)"],
 };
