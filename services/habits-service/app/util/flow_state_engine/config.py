@@ -9,6 +9,9 @@ class Params:
     HLT_ALPHA: float = 0.1
     HLT_BETA: float = 0.1
 
+    TREND_RESET_COEFFICIENT: float = 0.95
+    TREND_DAMPING: float = 0.5
+
     # Rubber Banding
     ELASTICITY_ABOVE_INFLECTION_POINT_DAYS: int = 14
     ELASTICITY_ABOVE_SIGMOID_STEEPNESS: float = 0.3

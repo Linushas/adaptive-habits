@@ -16,3 +16,11 @@ class DataPoint:
 class History:
     data_points: List[DataPoint]
     alpha: float
+
+
+@dataclass
+class ControllerState:
+    level: float
+    trend: float
+    target: float
+    streak: int
