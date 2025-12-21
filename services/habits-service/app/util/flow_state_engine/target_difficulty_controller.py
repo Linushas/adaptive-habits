@@ -1,48 +1,57 @@
 import numpy as np
 
 from app.util.flow_state_engine.config import params
-from app.util.flow_state_engine.data_classes import DataPoint, History
+from app.util.flow_state_engine.data_classes import DataPoint, History, ControllerState
 
 
 # notebooks/experiments/01_exploring.ipynb
 class TargetDifficultyController:
     def __init__(self, history: History):
-        self.current_level = history.data_points[0].value
-        self.current_trend = (
-            history.data_points[1].value - history.data_points[0].value
-            if (len(history.data_points) > 1)
-            else 0.0
+        self.history = history
+        self.state = ControllerState(
+            level=history.data_points[0].value,
+            trend=(
+                history.data_points[1].value - history.data_points[0].value
+                if (len(history.data_points) > 1)
+                else 0.0
+            ),
+            target=history.data_points[0].target,
+            streak=0
         )
-        self.current_target = history.data_points[0].target
-        self.current_value = history.data_points[0].value
-        self.current_streak = 0
+        
+    
+    def get_next_target(self) -> float:
+        data_points = self.history.data_points
+        for i in range(1, len(data_points)):
+            self.state = TargetDifficultyController.next_state(self.state, data_points[i].value)
+        
+        return self.state.target
 
-    def next_target(self):
-        value = self.current_value
-        target = self.current_target
-        streak = self.current_streak
-        level, trend, next_holt = self.holts_linear_trend(
-            self.current_level, self.current_trend, value
+    @staticmethod
+    def next_state(state: ControllerState, value: float) -> ControllerState:
+        target = state.target
+        streak = state.streak
+        level, trend, next_holt = TargetDifficultyController.holts_linear_trend(
+            state.level, state.trend, value
         )
 
         if value < target * params.TREND_RESET_COEFFICIENT:
-            # trend = 0.0
             trend = trend * params.TREND_DAMPING
             next_holt = level
 
         is_success = value >= target
         if is_success:
-            k = self.elasticity_above_sigmoid(streak)
+            k = TargetDifficultyController.elasticity_above_sigmoid(streak)
             streak += 1
         else:
-            k = self.elasticity_below_linear(streak)
+            k = TargetDifficultyController.elasticity_below_linear(streak)
             streak = 0
 
         cap = target * params.VALUE_INCREASE_CAP
         if value > cap:
             value = cap
 
-        next_target = self.target_rubber_band(
+        next_target = TargetDifficultyController.target_rubber_band(
             next_holt,
             value,
             target,
@@ -52,11 +61,13 @@ class TargetDifficultyController:
             params.MAX_TARGET_DECREASE,
         )
 
-        self.current_level = level
-        self.current_streak = streak
-        self.current_trend = trend
-        self.current_target = next_target
-        return level, trend, streak, next_target
+        new_state = ControllerState(
+            level = level,
+            streak = streak,
+            trend = trend,
+            target = next_target
+        )
+        return new_state
 
     @staticmethod
     def holts_linear_trend(
