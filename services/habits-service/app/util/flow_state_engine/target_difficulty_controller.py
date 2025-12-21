@@ -8,23 +8,24 @@ from app.util.flow_state_engine.data_classes import DataPoint, History, Controll
 class TargetDifficultyController:
     def __init__(self, history: History):
         self.history = history
-        self.state = ControllerState(
-            level=history.data_points[0].value,
-            trend=(
-                history.data_points[1].value - history.data_points[0].value
-                if (len(history.data_points) > 1)
-                else 0.0
-            ),
-            target=history.data_points[0].target,
-            streak=0
+
+        first_target = (
+            history.data_points[0].target if history.data_points[0].target else 0.0
         )
-        
-    
+        first_value = (
+            history.data_points[0].target if history.data_points[0].target else 0.0
+        )
+        self.state = ControllerState(
+            level=first_value, trend=0, target=first_target, streak=0
+        )
+
     def get_next_target(self) -> float:
         data_points = self.history.data_points
-        for i in range(1, len(data_points)):
-            self.state = TargetDifficultyController.next_state(self.state, data_points[i].value)
-        
+        for i in range(0, len(data_points)):
+            self.state = TargetDifficultyController.next_state(
+                self.state, data_points[i].value
+            )
+
         return self.state.target
 
     @staticmethod
@@ -62,10 +63,7 @@ class TargetDifficultyController:
         )
 
         new_state = ControllerState(
-            level = level,
-            streak = streak,
-            trend = trend,
-            target = next_target
+            level=level, streak=streak, trend=trend, target=next_target
         )
         return new_state
 

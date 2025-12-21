@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 from datetime import date
 from dataclasses import dataclass
 
@@ -14,7 +14,8 @@ class DataPoint:
 
 @dataclass
 class History:
-    data_points: List[DataPoint]
+    data_points: list[DataPoint]
+
 
 @dataclass
 class ControllerState:

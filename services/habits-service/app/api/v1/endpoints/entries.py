@@ -16,7 +16,10 @@ from app.models import (
 )
 from app.auth import get_current_user
 from app.util.target_calculation import calculate_next_target
-from app.util.flow_state_engine.target_difficulty_controller import TargetDifficultyController
+from app.util.flow_state_engine.target_difficulty_controller import (
+    TargetDifficultyController,
+)
+from app.util.flow_state_engine.data_classes import DataPoint, History
 from app.core.habits import get_habit
 from app.core.entries import calendar_entry_from_entries
 
@@ -87,10 +90,14 @@ def update_habit_entry(
     )
 
     history: List[HabitEntry] = session.exec(statement).all()
-    # next_target: int = calculate_next_target(history)
-    target_controller = TargetDifficultyController(history)
+    data_points = [
+        DataPoint(
+            value=entry.value, target=entry.target_snapshot, log_date=entry.log_date
+        )
+        for entry in history
+    ]
+    target_controller = TargetDifficultyController(History(data_points=data_points))
     next_target: int = round(target_controller.get_next_target())
-
 
     if habit.current_target_value != next_target and next_target:
         habit.current_target_value = next_target
