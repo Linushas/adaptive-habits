@@ -7,7 +7,7 @@ import { apiClient } from "@/lib/api";
 export const getTodaysEntries = async (
   selectedDate?: Date
 ): Promise<HabitEntry[]> => {
-  if (!selectedDate) {
+  if (!selectedDate || selectedDate > new Date()) {
     selectedDate = new Date();
     selectedDate.setHours(12, 0, 0, 0);
   }

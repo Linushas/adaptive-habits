@@ -2,59 +2,42 @@
 
 import { HabitCard } from "@/components/habits/HabitCard";
 import { HomeToolBar } from "@/components/habits/HomeToolBar";
-import { formatDateForApi } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useDate } from "@/hooks/useDate";
 
 export default function HomeDashboard() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const dateParam = searchParams.get("date");
-  const selectedDate = useMemo(() => {
-    return dateParam ? new Date(dateParam) : new Date();
-  }, [dateParam]);
+  const [selectedDate, onSelectedDate] = useDate("date", new Date());
 
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState<HabitEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSelectedDate = useCallback(
-    (date: Date | undefined) => {
-      if (!date || date > new Date()) return;
-      const params = new URLSearchParams(searchParams.toString());
+  const fetchEntries = useCallback(async () => {
+    if (!selectedDate) return;
 
-      const adjustedDate = new Date(date);
-      adjustedDate.setHours(12, 0, 0, 0);
-      params.set("date", formatDateForApi(adjustedDate));
-
-      router.push(`${pathname}?${params.toString()}`);
-    },
-    [searchParams, pathname, router]
-  );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const todays_entries: HabitEntry[] =
-          await getTodaysEntries(selectedDate);
-        if (todays_entries) setLocalEntries(todays_entries);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (selectedDate) {
-      fetchData();
+    try {
+      setIsLoading(true);
+      const todays_entries: HabitEntry[] = await getTodaysEntries(selectedDate);
+      console.log("Fetched entries:", todays_entries);
+      if (todays_entries) setLocalEntries(todays_entries);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   }, [selectedDate]);
+
+  const handleSelectDate = (date: Date | undefined) => {
+    if(!date || date > new Date()) return;
+      onSelectedDate(date);
+  }
+
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
 
   return (
     <div
@@ -65,8 +48,9 @@ export default function HomeDashboard() {
         <HomeToolBar
           hideCompleted={hideCompleted}
           onHideCompleted={() => setHideCompleted(!hideCompleted)}
-          onSelectDate={onSelectedDate}
+          onSelectDate={handleSelectDate}
           selectedDate={selectedDate}
+          onHabitAdded={fetchEntries}
           className="min-w-full"
         />
       </div>
@@ -91,6 +75,7 @@ export default function HomeDashboard() {
                       targetValue={entry.target_snapshot}
                       habitEntry={entry}
                       unit={entry.habit.unit}
+                      onHabitDeleted={fetchEntries}
                     />
                   </div>
                 )

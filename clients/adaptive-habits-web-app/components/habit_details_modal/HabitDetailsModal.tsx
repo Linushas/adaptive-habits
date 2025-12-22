@@ -18,15 +18,21 @@ import { HabitControls } from "./HabitControls";
 import { useState } from "react";
 import { ChartType } from "../time_chart/TimeChart";
 import { deleteHabitAction } from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 interface HabitDetailsProps {
   entry: HabitEntry;
+  onHabitDeleted: () => void;
+  title: string;
 }
 
-export function HabitDetailsModal({ entry }: HabitDetailsProps) {
+export function HabitDetailsModal({ entry, onHabitDeleted, title }: HabitDetailsProps) {
   const [habitDetails, setHabitDetails] = useState<HabitDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [chartType, setChartType] = useState(ChartType.STEP);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const router = useRouter();
 
   async function fetchHabitDetails() {
     if (habitDetails) return;
@@ -42,42 +48,28 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
     }
   }
 
+  const onDelete = async () => {
+    try {
+      await deleteHabitAction(entry.habit.id);
+      setIsOpen(false);
+      onHabitDeleted();
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to delete habit:", error);
+    }
+  };
+
   return (
     <Dialog
+      open={isOpen}
       onOpenChange={(open) => {
+        setIsOpen(open);
         if (open) fetchHabitDetails();
       }}
     >
       <DialogTrigger asChild>
-        <div
-          onClick={() =>
-            console.log(
-              habitDetails
-                ? habitDetails.habit.name + " clicked"
-                : "no loaded habit"
-            )
-          }
-          className="flex hover:bg-bg-light-2 hover:text-fg px-2 rounded-md"
-        >
-          <h3 className="m-auto">{entry.habit.name}</h3>
-          <Button
-            variant={"ghost"}
-            size={"icon"}
-            className="hover:bg-transparent text-transparent hover:text-fg p-0"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="size-6"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.5 12a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm6 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Button>
+        <div className="flex hover:bg-bg-light-2 hover:text-fg px-2 rounded-md cursor-pointer items-center py-2">
+          <h3 className="flex-1 text-left">{title}</h3>
         </div>
       </DialogTrigger>
       <DialogContent className="min-w-[100%] max-w-[100%] h-[100%] md:min-w-[80%] md:max-w-[80%] md:h-[80%] align-top">
@@ -116,10 +108,7 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
           >
             Switch Chart Type
           </Button>
-          <Button
-            variant={"primary"}
-            onClick={async () => await deleteHabitAction(entry.habit.id)}
-          >
+          <Button variant={"primary"} onClick={async () => await onDelete()}>
             Delete Habit
           </Button>
         </DialogFooter>

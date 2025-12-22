@@ -17,6 +17,7 @@ interface ToolBarProps {
   onSelectDate: (date: Date | undefined) => void;
   selectedDate: Date;
   className?: string;
+  onHabitAdded: () => void;
 }
 
 export function HomeToolBar({
@@ -25,6 +26,7 @@ export function HomeToolBar({
   onHideCompleted,
   onSelectDate,
   selectedDate,
+  onHabitAdded,
 }: ToolBarProps) {
   const [open, setOpen] = useState(false);
 
@@ -80,7 +82,7 @@ export function HomeToolBar({
         >
           {hideCompleted ? "Show Completed" : "Hide Completed"}
         </Button>
-        <NewHabitDialog />
+        <NewHabitDialog onHabitAdded={onHabitAdded} />
       </div>
     </div>
   );

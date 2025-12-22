@@ -2,12 +2,13 @@
 
 import { CalendarHabitEntry, Habit } from "@/types/index";
 import CalendarGrid from "./Calendar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "../ui/button";
 import { getCalendar } from "@/services/entries";
 import { useFilter } from "@/hooks/useFilter";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ChevronDownIcon } from "lucide-react";
+import { useDate } from "@/hooks/useDate";
 
 export interface CalendarProps {
   entries: CalendarHabitEntry[];
@@ -15,27 +16,33 @@ export interface CalendarProps {
 }
 
 export default function CalendarDashboard({ entries, habits }: CalendarProps) {
-  const [calendarEntries, setCalendarEntries] = useState(entries);
   const [today, setToday] = useState(new Date());
+  const [monthStart, setMonthStart] = useDate("month", new Date(today.getFullYear(), today.getMonth(), 1));
+  const [calendarEntries, setCalendarEntries] = useState(entries);
+
   const [habitsFilter, , , toggleItem, isToggled] = useFilter<string>();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  useEffect(() => {
-    const onFocus = () => {
-      const newToday = new Date();
-      if (
-        newToday.getDate() !== today.getDate() ||
-        newToday.getMonth() !== today.getMonth() ||
-        newToday.getFullYear() !== today.getFullYear()
-      ) {
-        console.log("Today (calendar): " + newToday);
-        setToday(newToday);
-      }
-    };
+  const fetchEntries = useCallback(async () => {
+    if (!monthStart) return;
+    const endDate = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0, 12, 0, 0)
 
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [today]);
+    try {
+      const entries: CalendarHabitEntry[] = await getCalendar(
+        monthStart, 
+        endDate, 
+        habitsFilter
+      );
+      if (entries) setCalendarEntries(entries);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [monthStart]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
+
 
   const months: string[] = [
     "January",
@@ -51,15 +58,14 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
     "November",
     "December",
   ];
-  const [month, setMonth] = useState(today.getMonth());
-  const [year, setYear] = useState(today.getFullYear());
 
   async function onMonthChange(direction: string) {
-    let newYear = year;
-    let newMonth = month;
+    let newYear = monthStart.getFullYear();
+    let newMonth = monthStart.getMonth();
+
+    console.log(newMonth);
 
     if (direction.includes("previous")) {
-      console.log("decrease");
       if (newMonth == 0) {
         newYear -= 1;
         newMonth = 11;
@@ -67,7 +73,6 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
         newMonth -= 1;
       }
     } else if (direction.includes("next")) {
-      console.log("increase");
       if (newMonth == 11) {
         newYear += 1;
         newMonth = 0;
@@ -79,20 +84,9 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
       newMonth = today.getMonth();
     }
 
-    setYear(newYear);
-    setMonth(newMonth);
+    console.log(newMonth);
 
-    try {
-      console.log("Selecting month: ", newYear, newMonth);
-      const entries: CalendarHabitEntry[] = await getCalendar(
-        new Date(newYear, newMonth, 1, 12, 0, 0),
-        new Date(newYear, newMonth + 1, 0, 12, 0, 0),
-        habitsFilter
-      );
-      if (entries) setCalendarEntries(entries);
-    } catch (e) {
-      console.error(e);
-    }
+    setMonthStart(new Date(newYear, newMonth, 1, 12, 0, 0));
   }
 
   return (
@@ -114,7 +108,7 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
             </svg>
           </Button>
           <span className="font-bold text-2xl min-w-[200px] text-center">
-            {months[month]} {year}
+            {months[monthStart.getMonth()]} {monthStart.getFullYear()}
           </span>
           <Button variant="secondary" onClick={() => onMonthChange("next")}>
             <svg
@@ -155,11 +149,10 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
                   <Button
                     key={index}
                     size={"sm"}
-                    className={`${
-                      isToggled(habit.id)
-                        ? "bg-fg text-bg-dark border border-fg"
-                        : "bg-bg-light border border-bg-light-2 text-fg-muted "
-                    } rounded-full hover:text-bg-dark`}
+                    className={`${isToggled(habit.id)
+                      ? "bg-fg text-bg-dark border border-fg"
+                      : "bg-bg-light border border-bg-light-2 text-fg-muted "
+                      } rounded-full hover:text-bg-dark`}
                     onClick={() => {
                       toggleItem(habit.id);
                       onMonthChange("current");
@@ -172,7 +165,7 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
             </PopoverContent>
           </Popover>
 
-          <Button
+          {/* <Button
             variant="secondary"
             onClick={() => {
               const now = new Date();
@@ -183,7 +176,7 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
             }}
           >
             Today
-          </Button>
+          </Button> */}
         </div>
       </div>
       <CalendarGrid entries={calendarEntries} today={today} habits={habits} />

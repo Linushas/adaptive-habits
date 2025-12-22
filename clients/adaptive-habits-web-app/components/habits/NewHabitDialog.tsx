@@ -20,6 +20,10 @@ import { Input } from "../ui/input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Textarea } from "../ui/textarea";
 
+interface NewHabitDialogProps {
+  onHabitAdded: () => void;
+}
+
 const formSchema = z.object({
   name: z
     .string()
@@ -48,7 +52,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function NewHabitDialog() {
+export function NewHabitDialog({ onHabitAdded }: NewHabitDialogProps) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,6 +94,8 @@ export function NewHabitDialog() {
 
     try {
       await addHabitAction(newHabit);
+      onHabitAdded();
+      form.reset();
     } catch (e) {
       console.error(e);
     }
