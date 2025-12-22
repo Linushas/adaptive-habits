@@ -1,7 +1,10 @@
 import HomeDashboard from "@/components/habits/HomeDashboard";
-import { getTodaysEntries } from "@/services/entries";
-import { HabitEntry } from "@/types";
+import { Suspense } from "react";
 
 export default async function Home() {
-  return <HomeDashboard />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeDashboard />
+    </Suspense>
+  );
 }

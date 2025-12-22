@@ -11,11 +11,10 @@ import { ChevronDownIcon } from "lucide-react";
 import { useDate } from "@/hooks/useDate";
 
 export interface CalendarProps {
-  entries: CalendarHabitEntry[];
   habits: Habit[];
 }
 
-export default function CalendarDashboard({ entries, habits }: CalendarProps) {
+export default function CalendarDashboard({ habits }: CalendarProps) {
   const [today, setToday] = useState(new Date());
   const [thisMonthStart] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
@@ -25,7 +24,9 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
     addMonths,
     resetToToday,
   } = useDate("month", thisMonthStart);
-  const [calendarEntries, setCalendarEntries] = useState(entries);
+  const [calendarEntries, setCalendarEntries] = useState<CalendarHabitEntry[]>(
+    []
+  );
 
   const [habitsFilter, , , toggleItem, isToggled] = useFilter<string>();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -171,7 +172,7 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
           </Button>
         </div>
       </div>
-      <CalendarGrid entries={calendarEntries} today={today} habits={habits} />
+      <CalendarGrid entries={calendarEntries} today={today} />
     </>
   );
 }

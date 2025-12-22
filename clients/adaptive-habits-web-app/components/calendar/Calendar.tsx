@@ -109,7 +109,8 @@ function CalendarCard({
   );
 }
 
-interface CalendarGridProps extends CalendarProps {
+interface CalendarGridProps {
+  entries: CalendarHabitEntry[];
   today: Date;
 }
 
