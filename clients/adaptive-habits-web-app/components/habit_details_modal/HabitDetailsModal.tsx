@@ -88,7 +88,7 @@ export function HabitDetailsModal({ entry }: HabitDetailsProps) {
         )}
 
         <div className="space-y-2 border-t border-fg-muted/10 pt-4">
-          <h3 className="font-bold text-fg">Description & Goals</h3>
+          <h3 className="font-bold text-fg">Description</h3>
           <span className="text-sm text-fg">
             {habitDetails ? habitDetails.habit.description : "Loading..."}
           </span>

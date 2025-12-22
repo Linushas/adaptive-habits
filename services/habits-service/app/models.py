@@ -1,9 +1,15 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from uuid import UUID, uuid4
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, JSON, Column
 from pydantic import BaseModel
 from datetime import datetime, date, timezone
 from app.config import settings
+from app.util.flow_state_engine.data_classes import ControllerState, Params
+
+
+class FrequencyConfig(BaseModel):
+    frequency: str = "daily"  # daily / weekly
+    weekdays: List[bool] = Field(default_factory=lambda: [True] * 7)
 
 
 ### USER ###
@@ -20,8 +26,15 @@ class HabitBase(SQLModel):
     name: str
     description: Optional[str] = None
     current_target_value: int = 1
-    frequency: str = "daily"
+    target_adaption_mode: str = "consent"  # consent / auto / none
+    # frequency: str = "daily"
     unit: Optional[str] = None
+    frequency_config: Optional[Dict[str, Any]] = Field(
+        default_factory=lambda: FrequencyConfig().model_dump(), sa_column=Column(JSON)
+    )
+    target_system_params: Optional[Dict[str, Any]] = Field(
+        default_factory=lambda: Params().model_dump(), sa_column=Column(JSON)
+    )
 
 
 class Habit(HabitBase, table=True):
@@ -50,14 +63,9 @@ class HabitEntryBase(SQLModel):
     target_snapshot: int
     notes: Optional[str] = None
     latest_ema: Optional[int] = None
-
-
-class HabitEntryUpdate(SQLModel):
-    log_date: Optional[date] = None
-    value: Optional[int] = None
-    target_snapshot: Optional[int] = None
-    notes: Optional[str] = None
-    completed_at: Optional[datetime] = None
+    target_state: Optional[Dict[str, Any]] = Field(
+        default_factory=lambda: ControllerState().model_dump(), sa_column=Column(JSON)
+    )
 
 
 class HabitEntry(HabitEntryBase, table=True):
@@ -68,13 +76,12 @@ class HabitEntry(HabitEntryBase, table=True):
     habit: Habit = Relationship(back_populates="entries")
 
 
-class HabitTodayEntryBase(SQLModel):
-    habit: Habit
-    log_date: date
-    value: int
-    target_snapshot: int
+class HabitEntryUpdate(SQLModel):
+    log_date: Optional[date] = None
+    value: Optional[int] = None
+    target_snapshot: Optional[int] = None
     notes: Optional[str] = None
-    completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
 
 
 class HabitTodayEntry(HabitEntryBase, table=False):

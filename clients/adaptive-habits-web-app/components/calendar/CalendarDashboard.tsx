@@ -1,18 +1,24 @@
 "use client";
 
-import { CalendarHabitEntry } from "@/types/index";
+import { CalendarHabitEntry, Habit } from "@/types/index";
 import CalendarGrid from "./Calendar";
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { getCalendar } from "@/services/entries";
+import { useFilter } from "@/hooks/useFilter";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ChevronDownIcon } from "lucide-react";
 
 export interface CalendarProps {
   entries: CalendarHabitEntry[];
+  habits: Habit[];
 }
 
-export default function CalendarDashboard({ entries }: CalendarProps) {
+export default function CalendarDashboard({ entries, habits }: CalendarProps) {
   const [calendarEntries, setCalendarEntries] = useState(entries);
   const [today, setToday] = useState(new Date());
+  const [habitsFilter, , , toggleItem, isToggled] = useFilter<string>();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     const onFocus = () => {
@@ -80,7 +86,8 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
       console.log("Selecting month: ", newYear, newMonth);
       const entries: CalendarHabitEntry[] = await getCalendar(
         new Date(newYear, newMonth, 1, 12, 0, 0),
-        new Date(newYear, newMonth + 1, 0, 12, 0, 0)
+        new Date(newYear, newMonth + 1, 0, 12, 0, 0),
+        habitsFilter
       );
       if (entries) setCalendarEntries(entries);
     } catch (e) {
@@ -125,20 +132,61 @@ export default function CalendarDashboard({ entries }: CalendarProps) {
           </Button>
         </div>
 
-        <Button
-          variant="secondary"
-          onClick={() => {
-            const now = new Date();
-            setYear(now.getFullYear());
-            setMonth(now.getMonth());
-            setToday(now);
-            onMonthChange("current");
-          }}
-        >
-          Today
-        </Button>
+        <div className="flex space-x-2">
+          <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="secondary"
+                id="date"
+                className="w-48  justify-between font-normal m-auto mx-2"
+              >
+                {habitsFilter.length > 0
+                  ? `${habitsFilter.length} Selected`
+                  : "Filter Habits"}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto overflow-hidden p-0 border border-none bg-transparent"
+              align="start"
+            >
+              <div className="space-x-2 space-y-2 flex-wrap gap-2 justify-end bg-bg-light p-2 rounded-xl border border-bg-light-2 max-w-[250px]">
+                {habits.map((habit, index) => (
+                  <Button
+                    key={index}
+                    size={"sm"}
+                    className={`${
+                      isToggled(habit.id)
+                        ? "bg-fg text-bg-dark border border-fg"
+                        : "bg-bg-light border border-bg-light-2 text-fg-muted "
+                    } rounded-full hover:text-bg-dark`}
+                    onClick={() => {
+                      toggleItem(habit.id);
+                      onMonthChange("current");
+                    }}
+                  >
+                    {habit.name}
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Button
+            variant="secondary"
+            onClick={() => {
+              const now = new Date();
+              setYear(now.getFullYear());
+              setMonth(now.getMonth());
+              setToday(now);
+              onMonthChange("current");
+            }}
+          >
+            Today
+          </Button>
+        </div>
       </div>
-      <CalendarGrid entries={calendarEntries} today={today} />
+      <CalendarGrid entries={calendarEntries} today={today} habits={habits} />
     </>
   );
 }

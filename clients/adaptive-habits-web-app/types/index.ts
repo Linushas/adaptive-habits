@@ -4,7 +4,11 @@ export interface HabitModel {
   name: string;
   description?: string;
   current_target_value: number;
-  frequency?: string;
+  frequency_config?: {
+    frequency: string;
+    weekdays: boolean[];
+  };
+  target_adaption_mode: string;
   unit?: string;
 }
 

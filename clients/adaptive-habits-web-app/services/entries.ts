@@ -34,7 +34,8 @@ export const updateHabitEntry = async (entry: HabitEntryUpdate) => {
 
 export const getCalendar = async (
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
+  habitIds?: string[]
 ): Promise<CalendarHabitEntry[]> => {
   const now = new Date();
   now.setHours(12, 0, 0, 0);
@@ -48,12 +49,22 @@ export const getCalendar = async (
     endStr = formatDateForApi(endDate);
   }
 
+  const params: Record<string, string> = {
+    start_date: startStr,
+    end_date: endStr,
+  };
+
+  if (habitIds && habitIds.length > 0) {
+    params.habit_ids = habitIds.join(",");
+  }
+
+  console.log(
+    `Getting calendar entries: FROM ${startStr} TO ${endStr} [Filter: ${params.habit_ids || "ALL"}]`
+  );
+
   console.log("Getting calendar entries: FROM " + startStr + " TO " + endStr);
   return apiClient<CalendarHabitEntry[]>("/entries/calendar", {
-    params: {
-      start_date: startStr,
-      end_date: endStr,
-    },
+    params: params,
     cache: "no-store",
   });
 };

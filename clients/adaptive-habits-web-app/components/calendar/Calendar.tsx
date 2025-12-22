@@ -59,7 +59,7 @@ function CalendarCard({
     <>
       <Card
         className={`
-                    relative w-24 h-24 transition-all duration-200 hover:shadow-xl hover:shadow-fg/10 cursor-pointer 
+                    relative w-16 h-16 md:w-24 md:h-24 transition-all duration-200 hover:shadow-xl hover:shadow-fg/10 cursor-pointer 
                     ${
                       dayNr == today.getDate() &&
                       date.getMonth() == today.getMonth() &&
@@ -75,7 +75,7 @@ function CalendarCard({
         }
       >
         <span
-          className={`absolute top-1 left-2 text-sm font-bold opacity-80 ${dayNr < today.getDate() ? "text-fg-muted/40" : "text-fg"}`}
+          className={`absolute top-1 left-2 text-xs md:text-sm font-bold opacity-80 ${dayNr < today.getDate() ? "text-fg-muted/40" : "text-fg"}`}
         >
           {dayNr}
         </span>

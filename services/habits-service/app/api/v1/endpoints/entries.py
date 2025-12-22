@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
 from datetime import date, timedelta, timezone, datetime
 from zoneinfo import ZoneInfo
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from uuid import UUID
 from app.db import get_session
@@ -13,6 +13,7 @@ from app.models import (
     HabitTodayEntry,
     Habit,
     CalendarHabitEntry,
+    FrequencyConfig,
 )
 from app.auth import get_current_user
 from app.util.target_calculation import calculate_next_target
@@ -137,8 +138,6 @@ def get_todays_entries(
     if selected_date:
         today: date = selected_date
 
-    print("Selected date: ", today)
-
     todays_entries: List[HabitTodayEntry] = []
 
     habits: List[Habit] = session.exec(
@@ -154,7 +153,13 @@ def get_todays_entries(
     }
 
     for habit in habits:
-        if habit.created_at.date() > today:
+        freq_config: FrequencyConfig = (
+            habit.frequency_config
+            if habit.frequency_config
+            else FrequencyConfig().model_dump()
+        )
+        weekdays = freq_config.get("weekdays", [True] * 7)
+        if habit.created_at.date() > today or not weekdays[today.weekday()]:
             continue
 
         entry = entries_map.get(habit.id)
@@ -174,7 +179,6 @@ def get_todays_entries(
         today_entry = HabitTodayEntry(**entry.model_dump(), habit=habit)
         todays_entries.append(today_entry)
 
-    # print(todays_entries)
     return todays_entries
 
 
@@ -182,6 +186,7 @@ def get_todays_entries(
 def get_calendar_entries(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
+    habit_ids: Optional[str] = None,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
@@ -190,13 +195,25 @@ def get_calendar_entries(
     if not start_date or not end_date:
         return []
 
-    # print("Selected start: ", start_date, ", selected end: ", end_date)
-
     statement = select(HabitEntry).where(
         HabitEntry.user_id == current_user.id,
         HabitEntry.log_date >= start_date,
         HabitEntry.log_date <= end_date,
     )
+    if habit_ids:
+        print(habit_ids)
+        try:
+            ids_list = [
+                UUID(id_str.strip())
+                for id_str in habit_ids.split(",")
+                if id_str.strip()
+            ]
+            if ids_list:
+                statement = statement.where(HabitEntry.habit_id.in_(ids_list))
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail="Invalid UUID format in habit_ids"
+            )
     all_entries: List[HabitEntry] = session.exec(statement).all()
 
     entries_date_lookup: Dict[date, List[HabitEntry]] = {}
@@ -210,5 +227,5 @@ def get_calendar_entries(
         calendar_entries.append(
             calendar_entry_from_entries(entries_date_lookup.get(d, []), d)
         )
-    # print(calendar_entries)
+
     return calendar_entries
