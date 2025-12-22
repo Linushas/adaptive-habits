@@ -8,7 +8,7 @@ export default async function Calendar() {
 
   return (
     <div className="bg-bg min-h-full w-full items-center justify-center flex flex-col">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense>
         <CalendarDashboard habits={habits} />
       </Suspense>
     </div>
