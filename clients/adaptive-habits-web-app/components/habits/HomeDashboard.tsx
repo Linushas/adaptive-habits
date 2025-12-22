@@ -6,31 +6,41 @@ import { formatDateForApi } from "@/lib/utils";
 import { getTodaysEntries } from "@/services/entries";
 import { HabitEntry } from "@/types/index";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
-interface HomeDashboardProps {
-  entries: HabitEntry[];
-}
+export default function HomeDashboard() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-export default function HomeDashboard({ entries }: HomeDashboardProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const dateParam = searchParams.get("date");
+  const selectedDate = useMemo(() => {
+    return dateParam ? new Date(dateParam) : new Date();
+  }, [dateParam]);
+
   const [hideCompleted, setHideCompleted] = useState(false);
-  const [localEntries, setLocalEntries] = useState(entries);
+  const [localEntries, setLocalEntries] = useState<HabitEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const onSelectedDate = (date: Date | undefined) => {
-    if (!date || date.valueOf() > new Date().valueOf()) return;
+  const onSelectedDate = useCallback(
+    (date: Date | undefined) => {
+      if (!date || date > new Date()) return;
+      const params = new URLSearchParams(searchParams.toString());
 
-    const adjustedDate = new Date(date);
-    adjustedDate.setHours(12, 0, 0, 0);
+      const adjustedDate = new Date(date);
+      adjustedDate.setHours(12, 0, 0, 0);
+      params.set("date", formatDateForApi(adjustedDate));
 
-    setSelectedDate(adjustedDate);
-  };
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [searchParams, pathname, router]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // console.log("-- " + formatDateForApi(selectedDate));
         setIsLoading(true);
         const todays_entries: HabitEntry[] =
           await getTodaysEntries(selectedDate);
@@ -41,11 +51,16 @@ export default function HomeDashboard({ entries }: HomeDashboardProps) {
         setIsLoading(false);
       }
     };
-    fetchData();
-  }, [selectedDate, hideCompleted]);
+    if (selectedDate) {
+      fetchData();
+    }
+  }, [selectedDate]);
 
   return (
-    <div className="bg-bg min-h-full w-full items-center justify-center flex flex-col">
+    <div
+      key={JSON.stringify(localEntries)}
+      className="bg-bg min-h-full w-full items-center justify-center flex flex-col"
+    >
       <div className="flex w-full max-w-4xl px-4 md:px-10 p-4 flex-wrap justify-start gap-4">
         <HomeToolBar
           hideCompleted={hideCompleted}
