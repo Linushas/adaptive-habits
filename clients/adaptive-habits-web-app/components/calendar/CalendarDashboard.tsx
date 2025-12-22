@@ -17,7 +17,14 @@ export interface CalendarProps {
 
 export default function CalendarDashboard({ entries, habits }: CalendarProps) {
   const [today, setToday] = useState(new Date());
-  const [monthStart, setMonthStart] = useDate("month", new Date(today.getFullYear(), today.getMonth(), 1));
+  const [thisMonthStart] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+  const {
+    date: monthStart,
+    addMonths,
+    resetToToday,
+  } = useDate("month", thisMonthStart);
   const [calendarEntries, setCalendarEntries] = useState(entries);
 
   const [habitsFilter, , , toggleItem, isToggled] = useFilter<string>();
@@ -25,75 +32,64 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
 
   const fetchEntries = useCallback(async () => {
     if (!monthStart) return;
-    const endDate = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0, 12, 0, 0)
+    const endDate = new Date(
+      monthStart.getFullYear(),
+      monthStart.getMonth() + 1,
+      0,
+      12,
+      0,
+      0
+    );
 
     try {
       const entries: CalendarHabitEntry[] = await getCalendar(
-        monthStart, 
-        endDate, 
+        monthStart,
+        endDate,
         habitsFilter
       );
       if (entries) setCalendarEntries(entries);
     } catch (e) {
       console.error(e);
     }
-  }, [monthStart]);
+  }, [monthStart, habitsFilter]);
 
   useEffect(() => {
+    const fetchEntries = async () => {
+      if (!monthStart) return;
+      const endDate = new Date(
+        monthStart.getFullYear(),
+        monthStart.getMonth() + 1,
+        0,
+        12,
+        0,
+        0
+      );
+
+      try {
+        const entries: CalendarHabitEntry[] = await getCalendar(
+          monthStart,
+          endDate,
+          habitsFilter
+        );
+        if (entries) setCalendarEntries(entries);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     fetchEntries();
-  }, [fetchEntries]);
+  }, [monthStart, habitsFilter]);
 
-
-  const months: string[] = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  async function onMonthChange(direction: string) {
-    let newYear = monthStart.getFullYear();
-    let newMonth = monthStart.getMonth();
-
-    console.log(newMonth);
-
-    if (direction.includes("previous")) {
-      if (newMonth == 0) {
-        newYear -= 1;
-        newMonth = 11;
-      } else {
-        newMonth -= 1;
-      }
-    } else if (direction.includes("next")) {
-      if (newMonth == 11) {
-        newYear += 1;
-        newMonth = 0;
-      } else {
-        newMonth += 1;
-      }
-    } else if (direction.includes("current")) {
-      newYear = today.getFullYear();
-      newMonth = today.getMonth();
-    }
-
-    console.log(newMonth);
-
-    setMonthStart(new Date(newYear, newMonth, 1, 12, 0, 0));
-  }
+  const monthLabel = monthStart.toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <>
       <div className="flex w-full max-w-4xl px-4 md:px-10 p-4 flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="secondary" onClick={() => onMonthChange("previous")}>
+          <Button variant="secondary" onClick={() => addMonths(-1)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -108,9 +104,9 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
             </svg>
           </Button>
           <span className="font-bold text-2xl min-w-[200px] text-center">
-            {months[monthStart.getMonth()]} {monthStart.getFullYear()}
+            {monthLabel}
           </span>
-          <Button variant="secondary" onClick={() => onMonthChange("next")}>
+          <Button variant="secondary" onClick={() => addMonths(1)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -149,13 +145,13 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
                   <Button
                     key={index}
                     size={"sm"}
-                    className={`${isToggled(habit.id)
-                      ? "bg-fg text-bg-dark border border-fg"
-                      : "bg-bg-light border border-bg-light-2 text-fg-muted "
-                      } rounded-full hover:text-bg-dark`}
+                    className={`${
+                      isToggled(habit.id)
+                        ? "bg-fg text-bg-dark border border-fg"
+                        : "bg-bg-light border border-bg-light-2 text-fg-muted "
+                    } rounded-full hover:text-bg-dark`}
                     onClick={() => {
                       toggleItem(habit.id);
-                      onMonthChange("current");
                     }}
                   >
                     {habit.name}
@@ -165,18 +161,14 @@ export default function CalendarDashboard({ entries, habits }: CalendarProps) {
             </PopoverContent>
           </Popover>
 
-          {/* <Button
+          <Button
             variant="secondary"
             onClick={() => {
-              const now = new Date();
-              setYear(now.getFullYear());
-              setMonth(now.getMonth());
-              setToday(now);
-              onMonthChange("current");
+              resetToToday();
             }}
           >
             Today
-          </Button> */}
+          </Button>
         </div>
       </div>
       <CalendarGrid entries={calendarEntries} today={today} habits={habits} />

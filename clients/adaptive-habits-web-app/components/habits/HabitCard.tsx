@@ -25,7 +25,7 @@ export function HabitCard({
   habitEntry,
   unit,
   className,
-  onHabitDeleted
+  onHabitDeleted,
 }: HabitCardProps) {
   const [localValue, setLocalValue] = useState(value);
   const [isInputOpen, setIsInputOpen] = useState(false);
@@ -69,10 +69,11 @@ export function HabitCard({
     <Card
       className={`
                 ${className} w-full md:w-fit md:min-w-sm p-4 flex-1 hover:bg-bg-light-2/60 cursor-pointer
-                ${localValue >= targetValue
-          ? "shadow-2xl shadow-fg/10"
-          : "shadow-none"
-        }
+                ${
+                  localValue >= targetValue
+                    ? "shadow-2xl shadow-fg/10"
+                    : "shadow-none"
+                }
             `}
     >
       <CardTitle>
@@ -134,10 +135,11 @@ export function HabitCard({
         {targetValue == 1 ? (
           <div className="flex items-center justify-center">
             <div
-              className={`${localValue
-                ? "cursor-pointer bg-fg w-16 h-16 text-bg-dark flex items-center justify-center m-auto rounded-md"
-                : "cursor-pointer bg-bg-light-2 w-16 h-16 text-fg-muted border border-fg-muted flex items-center justify-center m-auto rounded-md"
-                }
+              className={`${
+                localValue
+                  ? "cursor-pointer bg-fg w-16 h-16 text-bg-dark flex items-center justify-center m-auto rounded-md"
+                  : "cursor-pointer bg-bg-light-2 w-16 h-16 text-fg-muted border border-fg-muted flex items-center justify-center m-auto rounded-md"
+              }
                             `}
               onClick={() => {
                 handleCheckboxChange(localValue);

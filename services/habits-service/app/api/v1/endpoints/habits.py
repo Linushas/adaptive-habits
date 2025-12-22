@@ -56,6 +56,21 @@ def create_habit(
 ):
     habit = Habit(**new_habit.model_dump(), user_id=current_user.id)
     session.add(habit)
+
+    today = date.today()
+    freq_config = habit.frequency_config or {}
+    weekdays = freq_config.get("weekdays", [True] * 7)
+
+    if weekdays[today.weekday()]:
+        entry = HabitEntry(
+            habit_id=habit.id,
+            user_id=current_user.id,
+            log_date=today,
+            value=0,
+            target_snapshot=habit.current_target_value,
+        )
+        session.add(entry)
+
     session.commit()
     session.refresh(habit)
     return habit

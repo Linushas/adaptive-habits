@@ -120,13 +120,13 @@ export default function CalendarGrid({ entries, today }: CalendarGridProps) {
     <div className="py-8 flex w-full max-w-4xl p-4 flex-wrap justify-center items-center flex-col">
       <div className="flex flex-wrap justify-evenly gap-4">
         {entries.map((entry: CalendarHabitEntry, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             onClick={() => {
               const adjustedDate = new Date(entry.log_date);
               adjustedDate.setHours(12, 0, 0, 0);
-              if(adjustedDate > new Date) return;
-              router.push(`/?date=${formatDateForApi(adjustedDate)}`)
+              if (adjustedDate > new Date()) return;
+              router.push(`/?date=${formatDateForApi(adjustedDate)}`);
             }}
           >
             <CalendarCard

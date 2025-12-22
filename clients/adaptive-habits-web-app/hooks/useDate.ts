@@ -8,23 +8,42 @@ export function useDate(paramStr: string, initialDate: Date) {
   const searchParams = useSearchParams();
 
   const dateParam = searchParams.get(paramStr);
-  const selectedDate = useMemo(() => {
-    return dateParam ? new Date(dateParam) : initialDate;
-  }, [dateParam]);
 
-  const onSelectedDate = useCallback(
-    (date: Date | undefined) => {
-      if (!date) return;
+  const date = useMemo(() => {
+    return dateParam ? new Date(dateParam) : initialDate;
+  }, [dateParam, initialDate]);
+
+  const setDate = useCallback(
+    (newDate: Date | undefined) => {
+      if (!newDate) return;
       const params = new URLSearchParams(searchParams.toString());
 
-      const adjustedDate = new Date(date);
+      const adjustedDate = new Date(newDate);
       adjustedDate.setHours(12, 0, 0, 0);
-      params.set(paramStr, formatDateForApi(adjustedDate));
 
+      params.set(paramStr, formatDateForApi(adjustedDate));
       router.push(`${pathname}?${params.toString()}`);
     },
-    [searchParams, pathname, router]
+    [searchParams, pathname, router, paramStr]
   );
 
-  return [selectedDate, onSelectedDate] as const;
+  const addMonths = useCallback(
+    (amount: number) => {
+      const newDate = new Date(date);
+      newDate.setMonth(newDate.getMonth() + amount);
+      setDate(newDate);
+    },
+    [date, setDate]
+  );
+
+  const resetToToday = useCallback(() => {
+    setDate(initialDate);
+  }, [setDate, initialDate]);
+
+  return {
+    date,
+    setDate,
+    addMonths,
+    resetToToday,
+  };
 }

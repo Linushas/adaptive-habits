@@ -9,7 +9,11 @@ import { useEffect, useState, useCallback } from "react";
 import { useDate } from "@/hooks/useDate";
 
 export default function HomeDashboard() {
-  const [selectedDate, onSelectedDate] = useDate("date", new Date());
+  const [today, setToday] = useState(new Date());
+  const { date: selectedDate, setDate: onSelectedDate } = useDate(
+    "date",
+    today
+  );
 
   const [hideCompleted, setHideCompleted] = useState(false);
   const [localEntries, setLocalEntries] = useState<HabitEntry[]>([]);
@@ -21,8 +25,7 @@ export default function HomeDashboard() {
     try {
       setIsLoading(true);
       const todays_entries: HabitEntry[] = await getTodaysEntries(selectedDate);
-      console.log("Fetched entries:", todays_entries);
-      if (todays_entries) setLocalEntries(todays_entries);
+      setLocalEntries(todays_entries || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -30,20 +33,17 @@ export default function HomeDashboard() {
     }
   }, [selectedDate]);
 
-  const handleSelectDate = (date: Date | undefined) => {
-    if(!date || date > new Date()) return;
-      onSelectedDate(date);
-  }
-
   useEffect(() => {
     fetchEntries();
   }, [fetchEntries]);
 
+  const handleSelectDate = (date: Date | undefined) => {
+    if (!date || date > new Date()) return;
+    onSelectedDate(date);
+  };
+
   return (
-    <div
-      key={JSON.stringify(localEntries)}
-      className="bg-bg min-h-full w-full items-center justify-center flex flex-col"
-    >
+    <div className="bg-bg min-h-full w-full items-center justify-center flex flex-col">
       <div className="flex w-full max-w-4xl px-4 md:px-10 p-4 flex-wrap justify-start gap-4">
         <HomeToolBar
           hideCompleted={hideCompleted}

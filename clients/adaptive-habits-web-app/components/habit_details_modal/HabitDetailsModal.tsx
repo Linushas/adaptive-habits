@@ -26,7 +26,11 @@ interface HabitDetailsProps {
   title: string;
 }
 
-export function HabitDetailsModal({ entry, onHabitDeleted, title }: HabitDetailsProps) {
+export function HabitDetailsModal({
+  entry,
+  onHabitDeleted,
+  title,
+}: HabitDetailsProps) {
   const [habitDetails, setHabitDetails] = useState<HabitDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [chartType, setChartType] = useState(ChartType.STEP);
