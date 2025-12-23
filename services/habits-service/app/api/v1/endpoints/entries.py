@@ -125,7 +125,7 @@ def update_habit_entry(
         )
         weekdays = freq_config.get("weekdays", [True] * 7)
         next_date = today
-        for i in range(1, 7):
+        for i in range(1, 8):
             if weekdays[today.weekday()]:
                 next_date = today + timedelta(i)
                 break
