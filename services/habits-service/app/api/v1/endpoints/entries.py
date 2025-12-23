@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
-from datetime import date, timedelta, timezone, datetime
-from zoneinfo import ZoneInfo
-from fastapi import APIRouter, Depends, HTTPException, Query
+import math
+from datetime import date, timedelta
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from uuid import UUID
 from app.db import get_session
@@ -16,10 +16,10 @@ from app.models import (
     FrequencyConfig,
 )
 from app.auth import get_current_user
-from app.util.target_calculation import calculate_next_target
 from app.util.flow_state_engine.target_difficulty_controller import (
     TargetDifficultyController,
 )
+from app.util.flow_state_engine.data_classes import ControllerState
 from app.util.flow_state_engine.data_classes import DataPoint, History
 from app.core.habits import get_habit
 from app.core.entries import calendar_entry_from_entries
@@ -72,42 +72,72 @@ def update_habit_entry(
     for key, value in entry_data.items():
         setattr(habit_entry, key, value)
 
-    session.add(habit_entry)
-    session.commit()
-    session.refresh(habit_entry)
+    # session.add(habit_entry)
+    # session.commit()
+
+    if(habit_entry.target_snapshot == 1): 
+        session.add(habit_entry)
+        session.commit()
+        session.refresh(habit_entry)
+        return habit_entry
 
     ### Target adaption
-    habit = get_habit(session, current_user.id, habit_entry.habit_id)
+    habit: Habit = get_habit(session, current_user.id, habit_entry.habit_id)
+    
+
 
     statement = (
         select(HabitEntry)
         .where(
             HabitEntry.user_id == current_user.id,
             HabitEntry.habit_id == habit_entry.habit_id,
-            HabitEntry.log_date <= date.today(),
-            HabitEntry.log_date >= (habit_entry.log_date - timedelta(days=30)),
+            HabitEntry.log_date < habit_entry.log_date,
         )
-        .order_by(HabitEntry.log_date)
+        .order_by(HabitEntry.log_date.desc())
     )
-
-    history: List[HabitEntry] = session.exec(statement).all()
-    data_points = [
-        DataPoint(
-            value=entry.value, target=entry.target_snapshot, log_date=entry.log_date
+    yesterdays_entry = session.exec(statement).first()
+    
+    if yesterdays_entry and yesterdays_entry.target_state:
+        yesterdays_state = ControllerState(**yesterdays_entry.target_state)
+    else:
+        yesterdays_state = ControllerState(
+            level=habit_entry.value, 
+            target=habit_entry.target_snapshot
         )
-        for entry in history
-    ]
-    target_controller = TargetDifficultyController(History(data_points=data_points))
-    next_target: int = round(target_controller.get_next_target())
 
+    target_state: ControllerState = TargetDifficultyController.next_state(yesterdays_state, habit_entry.value)
+    habit_entry.target_state = target_state.model_dump()
+    
+    
+    session.add(habit_entry)
+    session.commit()
+    
+    
+    next_target: int = math.ceil(target_state.target)
+    
     if habit.current_target_value != next_target and next_target:
         habit.current_target_value = next_target
         session.add(habit)
         session.commit()
 
-        tomorrow = date.today() + timedelta(1)
+        today = date.today()
+        freq_config: FrequencyConfig = (
+            habit.frequency_config
+            if habit.frequency_config
+            else FrequencyConfig().model_dump()
+        )
+        weekdays = freq_config.get("weekdays", [True] * 7)
+        next_date = today
+        for i in range(1,7):
+            if weekdays[today.weekday()]:
+                next_date = today + timedelta(i)
+                break
+        if next_date == today:
+            session.refresh(habit_entry)
+            return habit_entry
+        
         statement = select(HabitEntry).where(
-            HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == tomorrow
+            HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == next_date
         )
         entry: HabitEntry = session.exec(statement).first()
         if entry:
@@ -117,7 +147,7 @@ def update_habit_entry(
         else:
             entry = HabitEntry(
                 habit_id=habit_entry.habit_id,
-                log_date=tomorrow,
+                log_date=next_date,
                 target_snapshot=next_target,
                 value=0,
                 user_id=current_user.id,
@@ -125,6 +155,7 @@ def update_habit_entry(
             session.add(entry)
             session.commit()
 
+    session.refresh(habit_entry)
     return habit_entry
 
 

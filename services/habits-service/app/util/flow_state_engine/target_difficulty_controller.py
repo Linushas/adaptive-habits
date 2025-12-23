@@ -19,14 +19,14 @@ class TargetDifficultyController:
             level=first_value, trend=0, target=first_target, streak=0
         )
 
-    def get_next_target(self) -> float:
+    def get_next_target(self) -> ControllerState:
         data_points = self.history.data_points
         for i in range(0, len(data_points)):
             self.state = TargetDifficultyController.next_state(
                 self.state, data_points[i].value
             )
 
-        return self.state.target
+        return self.state
 
     @staticmethod
     def next_state(state: ControllerState, value: float) -> ControllerState:
