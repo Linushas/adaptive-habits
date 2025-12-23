@@ -27,7 +27,9 @@ class Ema:
         return new_value
 
 
-@deprecated("Use app.util.flow_state_engine.target_difficulty_controller.TargetDifficultyController.get_next_target instead.")
+@deprecated(
+    "Use app.util.flow_state_engine.target_difficulty_controller.TargetDifficultyController.get_next_target instead."
+)
 def calculate_next_target(
     history: List[HabitEntry],
     alpha: float = settings.DEFAULT_EMA_ALPHA,

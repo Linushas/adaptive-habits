@@ -75,7 +75,7 @@ def update_habit_entry(
     # session.add(habit_entry)
     # session.commit()
 
-    if(habit_entry.target_snapshot == 1): 
+    if habit_entry.target_snapshot == 1:
         session.add(habit_entry)
         session.commit()
         session.refresh(habit_entry)
@@ -83,8 +83,6 @@ def update_habit_entry(
 
     ### Target adaption
     habit: Habit = get_habit(session, current_user.id, habit_entry.habit_id)
-    
-
 
     statement = (
         select(HabitEntry)
@@ -96,25 +94,24 @@ def update_habit_entry(
         .order_by(HabitEntry.log_date.desc())
     )
     yesterdays_entry = session.exec(statement).first()
-    
+
     if yesterdays_entry and yesterdays_entry.target_state:
         yesterdays_state = ControllerState(**yesterdays_entry.target_state)
     else:
         yesterdays_state = ControllerState(
-            level=habit_entry.value, 
-            target=habit_entry.target_snapshot
+            level=habit_entry.value, target=habit_entry.target_snapshot
         )
 
-    target_state: ControllerState = TargetDifficultyController.next_state(yesterdays_state, habit_entry.value)
+    target_state: ControllerState = TargetDifficultyController.next_state(
+        yesterdays_state, habit_entry.value
+    )
     habit_entry.target_state = target_state.model_dump()
-    
-    
+
     session.add(habit_entry)
     session.commit()
-    
-    
+
     next_target: int = math.ceil(target_state.target)
-    
+
     if habit.current_target_value != next_target and next_target:
         habit.current_target_value = next_target
         session.add(habit)
@@ -128,16 +125,17 @@ def update_habit_entry(
         )
         weekdays = freq_config.get("weekdays", [True] * 7)
         next_date = today
-        for i in range(1,7):
+        for i in range(1, 7):
             if weekdays[today.weekday()]:
                 next_date = today + timedelta(i)
                 break
         if next_date == today:
             session.refresh(habit_entry)
             return habit_entry
-        
+
         statement = select(HabitEntry).where(
-            HabitEntry.habit_id == habit_entry.habit_id, HabitEntry.log_date == next_date
+            HabitEntry.habit_id == habit_entry.habit_id,
+            HabitEntry.log_date == next_date,
         )
         entry: HabitEntry = session.exec(statement).first()
         if entry:
